@@ -5,50 +5,48 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 export const updateSession = async (request: NextRequest) => {
-  if (!supabaseUrl || !supabaseKey) {
-    console.error("Missing Supabase environment variables in Middleware!");
-    return NextResponse.next();
-  }
+  try {
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.next();
+    }
 
-  // Create an unmodified response
-  let supabaseResponse = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    });
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseKey,
-    {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
         },
       },
-    },
-  );
+    });
 
-  // refreshing the auth token
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // Protect sensitive routes
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/add') || request.nextUrl.pathname.startsWith('/profile')
-  
-  if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    // Protect sensitive routes
+    const isProtectedRoute = 
+      request.nextUrl.pathname.startsWith('/add') || 
+      request.nextUrl.pathname.startsWith('/profile');
+    
+    if (isProtectedRoute && !user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+
+    return response;
+  } catch (e) {
+    console.error("Middleware Error:", e);
+    return NextResponse.next();
   }
-
-  return supabaseResponse
 };
