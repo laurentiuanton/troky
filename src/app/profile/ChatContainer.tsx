@@ -202,11 +202,11 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       </div>
 
       {/* CHAT AREA (8/12) */}
-      <div className="md:col-span-8 flex flex-col bg-white">
+      <div className="md:col-span-8 flex flex-col bg-white min-h-0 relative">
         {selectedChat ? (
           <>
             {/* CHAT HEADER */}
-            <div className="p-4 border-b border-border flex items-center justify-between bg-white/80 backdrop-blur-md z-10 shadow-sm">
+            <div className="flex-none p-4 border-b border-border flex items-center justify-between bg-white/80 backdrop-blur-md z-10 shadow-sm">
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9 border border-border">
                     <AvatarFallback className="bg-[#10b981] text-white font-bold text-sm">
@@ -229,7 +229,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
             {/* MESSAGES VIEWPORT */}
             <div 
                 ref={scrollRef} 
-                className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 bg-[#fbfbf6]"
+                className="flex-1 min-h-0 overflow-y-auto p-8 flex flex-col gap-6 bg-[#fbfbf6]"
                 style={{ backgroundImage: 'radial-gradient(#37371f08 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }}
             >
               {messages.map((m: any) => {
