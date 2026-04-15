@@ -24,6 +24,18 @@ export async function createListing(formData: FormData) {
   const ce_doresc_la_schimb = formData.get('ce_doresc_la_schimb') as string || null
   const images = formData.getAll('images') as File[]
   const primaryImageName = formData.get('primary_image_name') as string
+  const category_slug = formData.get('category_slug') as string
+
+  // Find category ID by slug
+  let category_id = null
+  if (category_slug) {
+    const { data: catData } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', category_slug)
+      .single()
+    category_id = catData?.id
+  }
 
   // 1. Insert Listing
   const { data: listingData, error: listingError } = await supabase
@@ -35,6 +47,7 @@ export async function createListing(formData: FormData) {
       stare_produs,
       location,
       ce_doresc_la_schimb,
+      category_id,
       user_id: user.id
     })
     .select('id')

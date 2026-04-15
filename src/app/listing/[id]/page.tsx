@@ -1,9 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { MapPin, Clock, Tag, User, MessageCircle, AlertCircle } from 'lucide-react'
+import { MapPin, Clock, Tag, User, MessageCircle, AlertCircle, Calendar } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import ProductGallery from './ProductGallery'
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export const revalidate = 0
 
@@ -12,10 +19,8 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
-  // Aflam daca cel care viziteaza este logat
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Preia anuntul specificat dupa ID
   const { data: listing, error } = await supabase
     .from('listings')
     .select(`
@@ -27,126 +32,148 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
     .eq('id', params.id)
     .single()
 
-  // Daca nu exista (eroare de id, gresit etc), dam 404 Nextjs Default Error Page
   if (error || !listing) {
     notFound()
   }
 
-  // Check ownership
   const isOwner = user?.id === listing.user_id
 
   return (
-    <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+    <div className="container max-w-7xl py-12 px-4 animate-fade-in relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        {/* Partea Sângă: Imaginea și Galeria */}
-        <div>
+        {/* PARTEA STÂNGĂ: IMAGINI (7 COLOANE) */}
+        <div className="lg:col-span-7">
           <ProductGallery images={listing.listing_images || []} />
         </div>
 
-        {/* Partea Dreaptă: Detaliile Anunțului */}
-        <div>
-          <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ padding: '0.5rem 1.25rem', borderRadius: '100px', background: listing.tip_anunt === 'donatie' ? 'var(--primary)' : listing.tip_anunt === 'vreau' ? 'var(--accent)' : 'var(--secondary)', color: listing.tip_anunt === 'schimb' ? 'var(--foreground)' : 'var(--background)', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.8rem', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-              {listing.tip_anunt === 'donatie' ? 'Gratuit (Donez)' : listing.tip_anunt === 'vreau' ? 'Cerere (Vreau)' : 'Pentru Schimb'}
-            </span>
-            <span style={{ padding: '0.5rem 1.25rem', borderRadius: '100px', background: 'white', border: '1px solid var(--border)', color: 'var(--foreground)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <Tag size={14} style={{ color: 'var(--primary)' }}/> {listing.categories?.name || 'General'}
-            </span>
-          </div>
-
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--foreground)' }}>{listing.title}</h1>
+        {/* PARTEA DREAPTĂ: DETALII (5 COLOANE) */}
+        <div className="lg:col-span-5 flex flex-col gap-8">
           
-          <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--muted-foreground)', marginBottom: '2rem', fontSize: '0.95rem', flexWrap: 'wrap' }}>
-             <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <MapPin size={16}/> {listing.location}
-             </span>
-             <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Clock size={16}/> {new Date(listing.created_at).toLocaleDateString('ro-RO')}
-             </span>
+          <div className="space-y-6">
+            <div className="flex flex-wrap gap-2">
+              <Badge 
+                className={`text-[10px] font-black tracking-widest uppercase px-4 py-1.5 rounded-full ${
+                  listing.tip_anunt === 'donatie' ? 'bg-[#10b981] hover:bg-[#10b981]' : 
+                  listing.tip_anunt === 'vreau' ? 'bg-[#facc15] text-black hover:bg-[#facc15]' : 
+                  'bg-[#3b82f6] hover:bg-[#3b82f6]'
+                }`}
+              >
+                {listing.tip_anunt === 'donatie' ? 'Gratuit (Donez)' : listing.tip_anunt === 'vreau' ? 'Cerere (Vreau)' : 'Schimb (Barter)'}
+              </Badge>
+              <Badge variant="outline" className="text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-full border-border">
+                <Tag size={12} className="mr-1.5 text-primary" /> {listing.categories?.name || 'General'}
+              </Badge>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-[1.1]">
+              {listing.title}
+            </h1>
+
+            <div className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <MapPin size={16} className="text-[#ea9010]" /> {listing.location}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Calendar size={16} className="text-[#10b981]" /> {new Date(listing.created_at).toLocaleDateString('ro-RO')}
+              </div>
+            </div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--foreground)' }}>Descrierea produsului</h3>
-            <p style={{ margin: 0, color: 'var(--secondary-foreground)', whiteSpace: 'pre-wrap', lineHeight: '1.7' }}>
-              {listing.description}
+          <Separator className="bg-border/60" />
+
+          {/* DESCRIERE */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-black tracking-widest text-[#000] uppercase">Descrierea produsului</h3>
+            <p className="text-lg leading-relaxed text-foreground/80 font-medium italic">
+              "{listing.description}"
             </p>
-            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--muted-foreground)' }}>Stare produs:</span>
-              <strong style={{ color: 'var(--foreground)', textTransform: 'capitalize' }}>{listing.stare_produs}</strong>
+            
+            <div className="flex justify-between items-center p-4 bg-muted/30 rounded-xl border border-border/40">
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Stare produs:</span>
+              <Badge variant="secondary" className="font-bold text-sm px-4 py-1 rounded-lg uppercase">
+                {listing.stare_produs}
+              </Badge>
             </div>
             
             {listing.tip_anunt === 'schimb' && listing.ce_doresc_la_schimb && (
-              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(132, 204, 22, 0.1)', borderRadius: 'var(--radius)', border: '1px solid rgba(132, 204, 22, 0.3)' }}>
-                <strong style={{ display: 'block', color: 'var(--accent)', marginBottom: '0.4rem' }}>Ce doresc la schimb:</strong>
-                <span style={{ color: 'var(--secondary-foreground)' }}>{listing.ce_doresc_la_schimb}</span>
+              <div className="p-4 bg-[#3b82f6]/5 rounded-xl border border-[#3b82f6]/20">
+                <strong className="block text-xs font-black tracking-widest text-[#3b82f6] uppercase mb-2">Ce dorește la schimb:</strong>
+                <p className="text-foreground font-semibold leading-snug">{listing.ce_doresc_la_schimb}</p>
               </div>
             )}
           </div>
 
-          {/* Zona de Profil & Contact - Aplicam restrictia definita la Arhitectura! */}
-          <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)', overflow: 'hidden' }}>
-                {listing.profiles?.avatar_url ? (
-                  <img src={listing.profiles.avatar_url} alt="avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                ) : (
-                  <User size={24} />
-                )}
+          {/* CONTACT & PROFIL */}
+          <Card className="border-border shadow-2xl shadow-black/5 overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b border-border/40">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                  <AvatarImage src={listing.profiles?.avatar_url} />
+                  <AvatarFallback className="bg-[#10b981] text-white">
+                    <User size={20} />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h4 className="font-black text-lg text-foreground leading-none mb-1">
+                    {listing.profiles?.full_name || 'Utilizator Troky'}
+                  </h4>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                    Pe platformă din {listing.profiles?.created_at ? new Date(listing.profiles.created_at).getFullYear() : new Date().getFullYear()}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 style={{ margin: 0 }}>{listing.profiles?.full_name || 'Utilizator Troky'}</h4>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>Pe platformă din {listing.profiles?.created_at ? new Date(listing.profiles.created_at).getFullYear() : new Date().getFullYear()}</p>
-              </div>
-            </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              {!user ? (
+                <div className="space-y-4">
+                   <Alert className="bg-[#ea9010]/5 border-[#ea9010]/20 rounded-xl">
+                    <AlertCircle className="h-4 w-4 text-[#ea9010]" />
+                    <AlertTitle className="text-xs font-black uppercase tracking-widest text-[#ea9010]">Acces Restricționat</AlertTitle>
+                    <AlertDescription className="text-sm font-medium text-muted-foreground">
+                      Trebuie să fii autentificat pentru a contacta acest utilizator.
+                    </AlertDescription>
+                  </Alert>
+                  <Button asChild className="w-full bg-[#37371f] hover:bg-[#202012] text-white font-bold h-12 rounded-xl text-md">
+                    <Link href="/login">Autentifică-te pentru contact</Link>
+                  </Button>
+                </div>
+              ) : isOwner ? (
+                <div className="text-center py-4 text-sm font-bold text-muted-foreground italic uppercase tracking-widest">
+                  Gestionează acest anunț din profilul tău.
+                </div>
+              ) : (
+                <form action={async (formData) => {
+                  'use server'
+                  const { cookies } = await import('next/headers')
+                  const cookieStore = await cookies()
+                  const { createClient } = await import('@/utils/supabase/server')
+                  const s = createClient(cookieStore)
+                  const content = formData.get('content') as string
+                  
+                  await s.from('messages').insert({
+                     sender_id: user.id,
+                     receiver_id: listing.user_id,
+                     listing_id: listing.id,
+                     content
+                  })
 
-            {/* Aici e INIMA sistemului nostru: Securitatea la Date. Dacă n-ai sesiune, nu poți contacta. */}
-            {!user ? (
-              <div style={{ padding: '1rem', background: 'var(--background)', borderRadius: 'var(--radius)', border: '1px dashed var(--border)', textAlign: 'center' }}>
-                <AlertCircle size={24} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
-                <p style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--muted-foreground)' }}>Detaliile complete și interacțiunea sunt ascunse din motive de mediu sigur de schimbare.</p>
-                <Link href="/login" className="btn btn-primary" style={{ width: '100%' }}>Autentifică-te pentru a contacta</Link>
-              </div>
-            ) : isOwner ? (
-              <div style={{ padding: '1rem', background: 'var(--background)', borderRadius: 'var(--radius)', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                Acesta este anunțul tău.
-              </div>
-            ) : (
-              <form action={async (formData) => {
-                'use server'
-                const { cookies } = await import('next/headers')
-                const cookieStore = await cookies()
-                const { createClient } = await import('@/utils/supabase/server')
-                const s = createClient(cookieStore)
-                const content = formData.get('content') as string
-                
-                await s.from('messages').insert({
-                   sender_id: user.id,
-                   receiver_id: listing.user_id,
-                   listing_id: listing.id,
-                   content
-                })
-
-                /* Optional: Putem invoca aici utlitarul de Resend creat pt a trimite notificarea! */
-
-                const { redirect } = await import('next/navigation')
-                redirect('/profile?tab=mesaje')
-              }} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <textarea 
-                  name="content" 
-                  required 
-                  placeholder={`Salut, aș dori să facem un schimb pentru ${listing.title}...`} 
-                  className="form-input" 
-                  style={{ resize: 'vertical', padding: '1rem' }} 
-                  rows={3}
-                />
-                <button type="submit" className="btn btn-primary" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', width: '100%' }}>
-                  <MessageCircle size={20} /> Trimite Mesaj direct către {listing.profiles?.full_name?.split(' ')[0] || 'Utilizator'}
-                </button>
-              </form>
-            )}
-            
-          </div>
+                  const { redirect } = await import('next/navigation')
+                  redirect('/profile?tab=mesaje')
+                }} className="space-y-4">
+                  <Textarea 
+                    name="content" 
+                    required 
+                    placeholder={`Salut, mă interesează "${listing.title}"...`} 
+                    className="min-h-[100px] rounded-xl border-border bg-muted/10 text-md font-medium"
+                  />
+                  <Button type="submit" className="w-full bg-[#10b981] hover:bg-[#0d9668] text-white font-black h-12 rounded-xl text-md">
+                    <MessageCircle className="mr-2 h-5 w-5" /> Trimite Mesaj Direct
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
 
         </div>
       </div>

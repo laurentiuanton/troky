@@ -1,57 +1,57 @@
 'use client'
 
 import { useState } from 'react'
+import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 export default function ProductGallery({ images }: { images: any[] }) {
   const [activeImage, setActiveImage] = useState(images.find(img => img.is_primary)?.image_url || images[0]?.image_url || '')
 
   if (!images || images.length === 0) {
     return (
-      <div className="glass-panel" style={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-        <p style={{ color: 'var(--muted-foreground)' }}>Fără imagini disponibile.</p>
-      </div>
+      <Card className="w-full h-[400px] flex items-center justify-center bg-muted/20 border-dashed">
+        <p className="text-muted-foreground font-medium italic">Fără imagini disponibile.</p>
+      </Card>
     )
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="flex flex-col gap-6">
       
-      {/* Main Large Image */}
-      <div className="glass-panel" style={{ borderRadius: 'var(--radius)', overflow: 'hidden', border: '1px solid var(--border)', position: 'relative' }}>
+      {/* Imaginea Principală - Premium Display */}
+      <Card className="bg-white/50 backdrop-blur-sm rounded-3xl overflow-hidden border-border shadow-2xl shadow-black/5">
         <div 
+          className="w-full h-[550px] transition-all duration-700 ease-in-out hover:scale-[1.02] cursor-zoom-in"
           style={{ 
-            width: '100%', 
-            height: '500px', 
             backgroundImage: `url(${activeImage})`,
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundColor: 'rgba(255,255,255,0.5)',
-            transition: 'background-image 0.3s ease-in-out'
+            backgroundColor: '#fff'
           }} 
         />
-      </div>
+      </Card>
 
-      {/* Thumbnails Row */}
+      {/* Rândul de Miniaturi (Thumbnails) */}
       {images.length > 1 && (
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="flex gap-4 flex-wrap">
           {images.map((img, i) => (
-            <div 
+            <button 
               key={i} 
               onClick={() => setActiveImage(img.image_url)}
-              style={{ 
-                width: '80px', 
-                height: '80px', 
-                borderRadius: 'var(--radius)', 
-                overflow: 'hidden', 
-                cursor: 'pointer', 
-                border: activeImage === img.image_url ? '3px solid var(--accent)' : '2px solid transparent',
-                transition: 'all 0.2s',
-                opacity: activeImage === img.image_url ? 1 : 0.6
-              }}
+              className={cn(
+                "relative w-20 h-20 rounded-2xl overflow-hidden transition-all duration-300",
+                activeImage === img.image_url 
+                  ? "ring-4 ring-[#10b981] scale-110 shadow-lg z-10" 
+                  : "opacity-60 hover:opacity-100 hover:scale-105"
+              )}
             >
-              <img src={img.image_url} alt={`Thumbnail ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
+              <img 
+                src={img.image_url} 
+                alt={`Miniatura ${i}`} 
+                className="w-full h-full object-cover" 
+              />
+            </button>
           ))}
         </div>
       )}

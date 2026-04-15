@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Link from 'next/link'
-import { User, LogOut } from 'lucide-react'
+import { User, LogOut, PlusCircle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { logout } from '@/app/login/actions'
+import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Troky - Platformă Premium de Barter & Schimburi',
@@ -17,30 +18,39 @@ async function Header() {
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <header className="navbar">
-      <div className="container navbar-container">
-        <Link href="/" className="navbar-brand" style={{ fontSize: '1.8rem', fontWeight: 900, color: '#30f2f2' }}>
-          Troky
+    <header className="navbar border-b-2 border-primary/10 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="container flex h-16 items-center justify-between">
+        {/* LOGO LEFT */}
+        <Link href="/" className="text-2xl font-black tracking-tighter text-primary">
+          Troky<span className="text-[#10b981]">.</span>
         </Link>
-        <nav className="navbar-nav">
+
+        {/* ACTIONS RIGHT */}
+        <nav className="flex items-center gap-4">
           {user ? (
-            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-              <Link href="/add" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
-                 Anunț Nou
-              </Link>
-              <Link href="/profile" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, background: 'none' }}>
-                <User size={18} /> Contul Meu
-              </Link>
+            <>
+              <Button asChild variant="default" className="font-bold bg-[#ea9010] hover:bg-[#d07f0e] text-white rounded-full px-6">
+                <Link href="/add">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Anunț Nou
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="font-bold gap-2">
+                <Link href="/profile">
+                  <User size={18} /> Contul Meu
+                </Link>
+              </Button>
               <form action={logout}>
-                <button type="submit" className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.95rem', fontWeight: 500 }}>
-                  <LogOut size={18} /> Ieșire
-                </button>
+                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive transition-colors">
+                  <LogOut size={16} className="mr-2" /> Ieșire
+                </Button>
               </form>
-            </div>
+            </>
           ) : (
-            <Link href="/login" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
-              <User size={18} /> Autentificare
-            </Link>
+            <Button asChild variant="default" className="font-bold bg-[#37371f] hover:bg-[#202012] text-white rounded-full px-8">
+              <Link href="/login">
+                <User className="mr-2 h-4 w-4" /> Autentificare
+              </Link>
+            </Button>
           )}
         </nav>
       </div>
@@ -69,7 +79,8 @@ export default async function RootLayout({
 
   return (
     <html lang="ro">
-      <body suppressHydrationWarning style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <body suppressHydrationWarning className="flex flex-col min-h-screen">
+        <div className="bg-map" />
         <Header />
         <main className="main-content">
           {children}

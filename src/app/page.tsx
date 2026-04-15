@@ -24,38 +24,93 @@ export default async function Home() {
   return (
     <div className="container animate-fade-in">
       <section style={{ textAlign: 'center', padding: '5rem 0 6rem 0' }}>
-        <h1 style={{ fontSize: '3.6rem', marginBottom: '2rem', letterSpacing: '-1.5px', background: 'linear-gradient(to right, var(--primary), #30f2f2)', color: '#000', display: 'inline-block', padding: '0.8rem 2.5rem', borderRadius: '1rem', fontWeight: 900, boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+        <h1 style={{
+          fontSize: '3.6rem',
+          marginBottom: '2rem',
+          letterSpacing: '-1.5px',
+          background: 'linear-gradient(to right, #ea9010, #10b981, #3b82f6, #facc15)',
+          color: '#000',
+          display: 'inline-block',
+          padding: '1rem 3rem',
+          borderRadius: '1.25rem',
+          fontWeight: 900,
+          boxShadow: '0 15px 35px rgba(0,0,0,0.12)',
+          border: '2px solid rgba(255,255,255,0.2)'
+        }}>
           Dăruiește. Schimbă. Reciclează.
         </h1>
         <p style={{ fontSize: '1.9rem', color: '#1a1a10', maxWidth: '850px', margin: '0 auto 3.5rem', fontFamily: "'Dancing Script', cursive", fontWeight: 700, lineHeight: '1.2' }}>
-          „Aici, banii n-au valoare, singura plată acceptată fiind strângerea de mână.”
+          „Aici, banii n-au valoare, singura plată acceptată este strângerea de mână.”
         </p>
 
-        {/* BIG SEARCH BAR SPLIT IN TWO */}
-        <div style={{ maxWidth: '800px', margin: '0 auto 3rem auto', position: 'relative' }}>
-          <form action="/search" style={{ display: 'flex', background: 'var(--glass-bg)', padding: '0.4rem', borderRadius: '100px', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.15)', border: '1px solid var(--primary)' }}>
+        {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE */}
+        <div style={{ maxWidth: '850px', margin: '0 auto 4rem auto', position: 'relative' }}>
+          <form action="/search" style={{
+            display: 'flex',
+            background: 'var(--background)',
+            padding: '0.5rem',
+            borderRadius: '100px',
+            boxShadow: '0 12px 30px -10px rgba(55, 55, 31, 0.2)',
+            border: '2px solid var(--border)',
+            transition: 'all 0.3s ease',
+            alignItems: 'center'
+          }} className="search-bar-focus">
 
-            <div style={{ display: 'flex', alignItems: 'center', padding: '0 1rem', borderRight: '1px solid var(--border)' }}>
-              <select name="category" style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: '1.05rem', color: 'var(--foreground)', cursor: 'pointer' }}>
-                <option value="">Toate Categoriile</option>
-                {categories?.map((c) => (
-                  <option key={c.id} value={c.slug}>{c.name}</option>
+            {/* Category Side */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRight: '1px solid var(--border)', minWidth: '180px' }}>
+              <select
+                name="category"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  fontSize: '0.95rem',
+                  color: 'var(--foreground)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  width: '100%'
+                }}
+              >
+                <option value="" style={{ color: '#000', background: '#fff' }}>Toate Categoriile</option>
+                {categories?.map((c: any) => (
+                  <option key={c.id} value={c.slug} style={{ color: '#000', background: '#fff' }}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1rem' }}>
-              <Search size={22} style={{ color: 'var(--muted-foreground)', marginRight: '0.8rem' }} />
+            {/* Input Side */}
+            <div style={{ flex: 2, display: 'flex', alignItems: 'center', padding: '0 1.5rem' }}>
+              <Search size={20} style={{ color: 'var(--color-donez)', marginRight: '0.8rem', opacity: 0.8 }} />
               <input
                 type="text"
                 name="q"
-                placeholder="Caută plante, cărți, haine eco..."
-                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '1.15rem', outline: 'none', color: 'var(--foreground)' }}
+                placeholder="Ce cauți astăzi pe Troky?"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  background: 'transparent',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  color: 'var(--foreground)',
+                  fontWeight: 500
+                }}
               />
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ borderRadius: '100px', padding: '0.9rem 2.5rem', fontSize: '1.15rem' }}>
-              Explorează
+            {/* Submit Button */}
+            <button type="submit" className="btn btn-primary" style={{
+              borderRadius: '100px',
+              padding: '0.8rem 2.5rem',
+              fontSize: '1rem',
+              fontWeight: 700,
+              background: 'var(--primary)',
+              color: 'var(--background)',
+              boxShadow: '0 4px 15px rgba(55, 55, 31, 0.2)',
+              marginLeft: '0.5rem'
+            }}>
+              Caută
             </button>
           </form>
         </div>
@@ -68,7 +123,6 @@ export default async function Home() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Adaugă</h3>
-              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontWeight: 500 }}>Rapid</p>
             </div>
           </Link>
 
@@ -78,7 +132,6 @@ export default async function Home() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Donez</h3>
-              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontWeight: 500 }}>Gratuit</p>
             </div>
           </Link>
 
@@ -88,7 +141,6 @@ export default async function Home() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Schimb</h3>
-              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontWeight: 500 }}>Barter</p>
             </div>
           </Link>
 
@@ -98,7 +150,6 @@ export default async function Home() {
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Vreau</h3>
-              <p style={{ margin: 0, color: '#666', fontSize: '0.8rem', fontWeight: 500 }}>Caut</p>
             </div>
           </Link>
         </div>

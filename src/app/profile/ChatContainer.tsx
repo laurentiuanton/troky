@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Send, User as UserIcon, Package, Check, CheckCheck, Clock } from 'lucide-react'
+import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { cn } from "@/lib/utils"
 
 export default function ChatContainer({ currentUser, initialConversations }: { currentUser: any, initialConversations: any[] }) {
   const [conversations, setConversations] = useState(initialConversations)
@@ -13,7 +19,6 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
-  // Listen for NEW messages globally to update sidebar previews
   useEffect(() => {
     const sidebarChannel = supabase
       .channel('sidebar-updates')
@@ -23,7 +28,6 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
         table: 'messages'
       }, (payload) => {
         const msg = payload.new
-        // Check if this message belongs to any conversation of the current user
         if (msg.sender_id === currentUser.id || msg.receiver_id === currentUser.id) {
             updateSidebar(msg)
         }
@@ -45,7 +49,6 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
                 last_message: msg.content,
                 last_date: msg.created_at
             }
-            // Move to top
             const item = newConv.splice(convIndex, 1)[0]
             return [item, ...newConv]
         }
@@ -66,14 +69,12 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
             filter: `listing_id=eq.${selectedChat.listing_id}`
         }, (payload) => {
             const msg = payload.new
-            // Correct conversation check
             const isRelevant = 
                 (msg.sender_id === currentUser.id && msg.receiver_id === selectedChat.other_user_id) ||
                 (msg.sender_id === selectedChat.other_user_id && msg.receiver_id === currentUser.id)
             
             if (isRelevant) {
                 setMessages(prev => {
-                    // Avoid duplicates from optimistic update
                     if (prev.some(m => m.id === msg.id || (m.temp_id && m.content === msg.content))) {
                         return prev.map(m => (m.temp_id && m.content === msg.content) ? msg : m)
                     }
@@ -100,7 +101,6 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       .select('*')
       .eq('listing_id', chat.listing_id)
       .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${chat.other_user_id}),and(sender_id.eq.${chat.other_user_id},receiver_id.eq.${currentUser.id})`) 
-      // Note: better filter logic normally involves sender/receiver cross-check
       .order('created_at', { ascending: true })
     
     setMessages(data || [])
@@ -115,7 +115,6 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
     const msgContent = newMessage.trim()
     setNewMessage('')
 
-    // OPTIMISTIC UPDATE (WhatsApp Style)
     const optimisticMsg = {
       id: tempId,
       temp_id: tempId,
@@ -138,121 +137,127 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
 
     if (error) {
         setMessages(prev => prev.filter(m => m.id !== tempId))
-        alert('Eroare la trimiterea mesajului.')
     } else {
-        // Realtime listener will handle the update, but we can also update status locally
         setMessages(prev => prev.map(m => m.id === tempId ? { ...data, status: 'sent' } : m))
     }
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 350px) 1fr', gap: '0', background: 'var(--border)', height: '650px', borderRadius: 'var(--radius)', overflow: 'hidden', border: '1px solid var(--border)', boxShadow: 'var(--glass-shadow)' }}>
-      {/* Sidebar - WhatsApp Style */}
-      <div style={{ background: 'var(--background)', overflowY: 'auto', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(5px)' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Mesaje Recente</h3>
+    <Card className="grid grid-cols-1 md:grid-cols-12 h-[750px] border-border shadow-2xl shadow-black/5 rounded-3xl overflow-hidden bg-background">
+      
+      {/* SIDEBAR CONVERSATIONS (4/12) */}
+      <div className="md:col-span-4 border-r border-border flex flex-col bg-muted/5">
+        <div className="p-6 border-b border-border bg-white/40 backdrop-blur-md">
+            <h3 className="text-sm font-black tracking-widest uppercase mb-4">Mesaje Recente</h3>
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                <Input placeholder="Caută în mesaje..." className="h-9 pl-9 rounded-xl border-border bg-background/50 text-xs font-semibold" />
+            </div>
         </div>
-        <div style={{ flex: 1 }}>
-            {conversations.length > 0 ? conversations.map((chat: any) => (
-            <div 
-                key={`${chat.listing_id}-${chat.other_user_id}`} 
-                onClick={() => setSelectedChat(chat)}
-                style={{ 
-                padding: '1rem', 
-                cursor: 'pointer', 
-                borderBottom: '1px solid rgba(55,55,31,0.05)',
-                background: selectedChat?.listing_id === chat.listing_id && selectedChat?.other_user_id === chat.other_user_id ? 'rgba(55,55,31,0.08)' : 'transparent',
-                transition: 'all 0.2s',
-                position: 'relative'
-                }}
-            >
-                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--primary)', color: '#eaefbd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0 }}>
-                    {chat.other_user_name?.charAt(0).toUpperCase() || '?'}
-                </div>
-                <div style={{ overflow: 'hidden', flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
-                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--foreground)' }}>{chat.other_user_name || 'Utilizator'}</span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--muted-foreground)' }}>{new Date(chat.last_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        
+        <ScrollArea className="flex-1">
+            <div className="divide-y divide-border/40">
+                {conversations.length > 0 ? conversations.map((chat: any) => {
+                    const isSelected = selectedChat?.listing_id === chat.listing_id && selectedChat?.other_user_id === chat.other_user_id
+                    return (
+                        <button 
+                            key={`${chat.listing_id}-${chat.other_user_id}`} 
+                            onClick={() => setSelectedChat(chat)}
+                            className={cn(
+                                "w-full p-5 text-left transition-all relative flex items-center gap-4 hover:bg-muted/30",
+                                isSelected ? "bg-white shadow-inner" : ""
+                            )}
+                        >
+                            <Avatar className="h-12 w-12 rounded-2xl border-2 border-background shadow-sm">
+                                <AvatarFallback className="bg-[#37371f] text-white font-black text-lg">
+                                    {chat.other_user_name?.charAt(0).toUpperCase() || '?'}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-center mb-0.5">
+                                    <span className="font-bold text-sm text-foreground truncate">{chat.other_user_name || 'Utilizator'}</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(chat.last_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 mb-1">
+                                    <Package size={10} className="text-[#ea9010]" />
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/80 truncate">{chat.listing_title}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground truncate opacity-70 font-medium italic">
+                                    {chat.last_message}
+                                </p>
+                            </div>
+                            {isSelected && (
+                                <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-[#ea9010] rounded-l-full" />
+                            )}
+                        </button>
+                    )
+                }) : (
+                    <div className="p-12 text-center text-muted-foreground text-xs font-bold uppercase tracking-widest italic opacity-50">
+                        Nicio conversație
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <Package size={12} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--muted-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.listing_title}</span>
-                    </div>
-                    {/* MESSAGE PREVIEW */}
-                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--muted-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', opacity: 0.8 }}>
-                        {chat.last_message}
-                    </p>
-                </div>
-                </div>
-                {selectedChat?.listing_id === chat.listing_id && selectedChat?.other_user_id === chat.other_user_id && (
-                    <div style={{ position: 'absolute', right: 0, top: '20%', bottom: '20%', width: '4px', background: 'var(--accent)', borderRadius: '4px 0 0 4px' }} />
                 )}
             </div>
-            )) : (
-            <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Nicio conversație activă încă.</div>
-            )}
-        </div>
+        </ScrollArea>
       </div>
 
-      {/* Chat Area */}
-      <div style={{ background: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+      {/* CHAT AREA (8/12) */}
+      <div className="md:col-span-8 flex flex-col bg-white">
         {selectedChat ? (
           <>
-            {/* Header */}
-            <div style={{ padding: '0.8rem 1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--background)', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', zIndex: 10 }}>
-              <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--primary)', color: '#eaefbd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                    {selectedChat.other_user_name?.charAt(0)}
-                </div>
+            {/* CHAT HEADER */}
+            <div className="p-4 border-b border-border flex items-center justify-between bg-white/80 backdrop-blur-md z-10 shadow-sm">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-9 w-9 border border-border">
+                    <AvatarFallback className="bg-[#10b981] text-white font-bold text-sm">
+                        {selectedChat.other_user_name?.charAt(0)}
+                    </AvatarFallback>
+                </Avatar>
                 <div>
-                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{selectedChat.other_user_name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Online acum</div>
+                    <h4 className="font-bold text-sm">{selectedChat.other_user_name}</h4>
+                    <div className="flex items-center gap-1.5 leading-none">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground">Activ acum</span>
+                    </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem', borderRadius: '100px', background: 'white', border: '1px solid var(--border)', fontWeight: 600, color: 'var(--foreground)' }}>
-                    {selectedChat.listing_title}
-                  </div>
-              </div>
+              <Badge variant="outline" className="rounded-lg font-bold border-border bg-muted/20 text-[10px] uppercase px-3 py-1">
+                {selectedChat.listing_title}
+              </Badge>
             </div>
 
-            {/* Messages Pane */}
-            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.2rem', background: '#f8f8ef', backgroundImage: 'radial-gradient(#37371f10 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+            {/* MESSAGES VIEWPORT */}
+            <div 
+                ref={scrollRef} 
+                className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 bg-[#fbfbf6]"
+                style={{ backgroundImage: 'radial-gradient(#37371f08 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }}
+            >
               {messages.map((m: any) => {
                 const isMe = m.sender_id === currentUser.id
                 return (
                   <div 
                     key={m.id} 
-                    style={{ 
-                      maxWidth: '75%', 
-                      alignSelf: isMe ? 'flex-end' : 'flex-start',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.2rem'
-                    }}
+                    className={cn(
+                      "max-w-[80%] flex flex-col gap-1 animate-in fade-in slide-in-from-bottom-2 duration-300",
+                      isMe ? "self-end items-end" : "self-start items-start"
+                    )}
                   >
-                    <span style={{ fontSize: '0.7rem', color: 'var(--muted-foreground)', fontWeight: 600, alignSelf: isMe ? 'flex-end' : 'flex-start', margin: '0 0.5rem' }}>
-                        {isMe ? 'Tu' : selectedChat.other_user_name}
-                    </span>
                     <div 
-                        style={{ 
-                        background: isMe ? 'var(--primary)' : 'var(--background)',
-                        color: isMe ? 'var(--background)' : 'var(--foreground)',
-                        padding: '0.7rem 1.1rem',
-                        borderRadius: isMe ? '1.25rem 1.25rem 0.2rem 1.25rem' : '1.25rem 1.25rem 1.25rem 0.2rem',
-                        fontSize: '0.95rem',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                        position: 'relative',
-                        border: isMe ? 'none' : '1px solid var(--border)'
-                        }}
+                        className={cn(
+                            "px-5 py-3 text-sm font-medium shadow-xl shadow-black/5 transition-all text-sm",
+                            isMe 
+                                ? "bg-[#37371f] text-white rounded-[20px] rounded-br-[4px]" 
+                                : "bg-white text-foreground rounded-[20px] rounded-bl-[4px] border border-border/60"
+                        )}
                     >
                         {m.content}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem', fontSize: '0.65rem', opacity: 0.8, marginTop: '0.2rem' }}>
+                        <div className={cn(
+                            "flex items-center justify-end gap-1.5 text-[9px] font-bold mt-1.5 uppercase tracking-tighter opacity-60",
+                            isMe ? "text-white/80" : "text-muted-foreground"
+                        )}>
                             {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             {isMe && (
-                                m.status === 'sending' ? <Clock size={10} /> : 
-                                m.read_state ? <CheckCheck size={12} style={{ color: '#30f2f2' }} /> : <Check size={12} />
+                                m.status === 'sending' ? <Clock size={8} /> : 
+                                m.read_state ? <CheckCheck size={10} className="text-[#30f2f2]" /> : <Check size={10} />
                             )}
                         </div>
                     </div>
@@ -261,32 +266,33 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
               })}
             </div>
 
-            {/* Input WhatsApp Style */}
-            <div style={{ padding: '1.25rem', background: 'var(--background)', borderTop: '1px solid var(--border)' }}>
-                <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', background: 'var(--input)', padding: '0.4rem', borderRadius: '100px', border: '1px solid var(--border)', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                    <input 
-                        type="text" 
+            {/* INPUT AREA */}
+            <div className="p-6 border-top border-border bg-white">
+                <form onSubmit={handleSendMessage} className="flex gap-3 items-center bg-muted/30 p-1.5 rounded-full border border-border shadow-inner">
+                    <Input 
                         value={newMessage} 
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Scrie un mesaj aici..." 
-                        style={{ flex: 1, background: 'none', border: 'none', padding: '0.5rem 1rem', fontSize: '1rem', outline: 'none', color: 'var(--foreground)' }}
+                        placeholder="Trimite un mesaj prietenos..." 
+                        className="flex-1 bg-transparent border-none focus-visible:ring-0 text-sm font-medium px-4 h-11"
                     />
-                    <button type="submit" className="btn" style={{ width: '40px', height: '40px', padding: 0, borderRadius: '50%', background: 'var(--primary)', color: 'var(--background)' }}>
-                        <Send size={20} />
-                    </button>
+                    <Button type="submit" size="icon" className="h-11 w-11 rounded-full bg-[#37371f] hover:bg-[#10b981] transition-all shadow-lg active:scale-90">
+                        <Send size={18} className="translate-x-0.5 -translate-y-0.5" />
+                    </Button>
                 </form>
             </div>
           </>
         ) : (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)', padding: '2rem', textAlign: 'center' }}>
-             <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(55,55,31,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                <Send size={48} style={{ opacity: 0.2 }} />
+          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-muted/5">
+             <div className="w-24 h-24 rounded-full bg-muted/20 flex items-center justify-center mb-8 border border-border/40">
+                <MessageSquare size={48} className="text-muted-foreground/30" />
              </div>
-             <h2 style={{ color: 'var(--foreground)', marginBottom: '0.5rem' }}>Alege o conversație</h2>
-             <p style={{ maxWidth: '300px' }}>Selectează cineva din lista din stânga pentru a trimite un mesaj în timp real.</p>
+             <h2 className="text-xl font-black uppercase tracking-tight text-foreground mb-2">Cutia poștală Troky</h2>
+             <p className="text-muted-foreground font-semibold italic text-sm max-w-xs">
+                Selectează o conversație pentru a vedea detaliile barterului.
+             </p>
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
