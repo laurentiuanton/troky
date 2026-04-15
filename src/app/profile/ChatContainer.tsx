@@ -62,32 +62,44 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       fetchMessages(selectedChat)
       
       const chatChannel = supabase
-        .channel(`chat:${selectedChat.listing_id}`)
+        .channel(`chat_room_${selectedChat.listing_id}`)
         .on('postgres_changes', { 
             event: 'INSERT', 
             schema: 'public', 
             table: 'messages',
-            filter: `listing_id=eq.${selectedChat.listing_id}`
         }, (payload: any) => {
             const msg = payload.new
-            const isRelevant = 
+            
+            // Verificăm dacă mesajul aparține acestei conversații specifice
+            const isForThisListing = msg.listing_id === selectedChat.listing_id
+            const isBetweenUsers = 
                 (msg.sender_id === currentUser.id && msg.receiver_id === selectedChat.other_user_id) ||
                 (msg.sender_id === selectedChat.other_user_id && msg.receiver_id === currentUser.id)
             
-            if (isRelevant) {
+            if (isForThisListing && isBetweenUsers) {
                 setMessages(prev => {
-                    if (prev.some(m => m.id === msg.id || (m.temp_id && m.content === msg.content))) {
-                        return prev.map(m => (m.temp_id && m.content === msg.content) ? msg : m)
+                    // Evităm duplicatele (dacă mesajul a fost deja adăugat optimist)
+                    if (prev.some(m => m.id === msg.id)) return prev
+                    
+                    // Înlocuim mesajul optimist (starea 'sending') cu cel real de la server
+                    const tempIndex = prev.findIndex(m => m.temp_id && m.content === msg.content)
+                    if (tempIndex > -1) {
+                        const newMsgs = [...prev]
+                        newMsgs[tempIndex] = msg
+                        return newMsgs
                     }
+                    
                     return [...prev, msg]
                 })
             }
         })
-        .subscribe()
+        .subscribe((status) => {
+            console.log("Realtime status:", status)
+        })
 
       return () => { supabase.removeChannel(chatChannel) }
     }
-  }, [selectedChat])
+  }, [selectedChat, currentUser.id])
 
   useEffect(() => {
     if (scrollRef.current) {
