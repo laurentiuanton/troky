@@ -93,7 +93,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
                 })
             }
         })
-        .subscribe((status) => {
+        .subscribe((status: any) => {
             console.log("Realtime status:", status)
         })
 
