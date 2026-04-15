@@ -23,12 +23,8 @@ export default function LoginPage() {
     setSuccessMsg('')
     
     if (isForgot) {
-      const result = await resetPassword(formData)
-      if (result && result.error) {
-        setErrorMsg(result.error)
-      } else {
-        setSuccessMsg('Email-ul de resetare a fost trimis! Vă rugăm să verificați inbox-ul.')
-      }
+      await resetPassword(formData)
+      setSuccessMsg('Email-ul de resetare a fost trimis! Vă rugăm să verificați inbox-ul.')
       setLoading(false)
       return
     }

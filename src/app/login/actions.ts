@@ -54,7 +54,7 @@ export async function signup(formData: FormData) {
   redirect('/')
 }
 
-export async function logout() {
+export async function logout(formData?: FormData) {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
   
@@ -70,10 +70,10 @@ export async function resetPassword(formData: FormData) {
   const email = formData.get('email') as string
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'http://localhost:3000/auth/callback?next=/profile?tab=setari',
+    redirectTo: 'https://troky.vercel.app/auth/callback?next=/profile?tab=setari',
   })
 
   if (error) {
-    return { error: 'A apărut o eroare la trimiterea emailului.' }
+    console.error('Reset error:', error)
   }
 }

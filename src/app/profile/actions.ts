@@ -22,12 +22,12 @@ export async function updatePassword(formData: FormData) {
   return { success: 'Parola a fost actualizată cu succes!' }
 }
 
-export async function deleteListing(listingId: string) {
+export async function deleteListing(listingId: string, formData: FormData) {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Neautorizat' }
+  if (!user) return
 
   const { error } = await supabase
     .from('listings')
@@ -36,7 +36,8 @@ export async function deleteListing(listingId: string) {
     .eq('user_id', user.id) // Security check
 
   if (error) {
-    return { error: 'Nu s-a putut șterge anunțul.' }
+    console.error('Delete error:', error)
+    return
   }
 
   const { revalidatePath } = await import('next/cache')
