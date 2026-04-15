@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --background: #eaefbd; /* Cream */
+  --foreground: #37371f; /* Dark Khaki */
+  
+  --primary: #37371f; /* Dark Khaki for Buttons as requested */
+  --primary-hover: #202012; /* Darker Khaki */
+  --secondary: #90be6d; /* Willow Green */
+  --secondary-foreground: #37371f; 
+  
+  --accent: #ea9010; /* Carrot Orange */
+  --accent-foreground: #ffffff;
+  
+  --muted: rgba(55, 55, 31, 0.1); 
+  --muted-foreground: #5e6040; 
+  
+  --border: #c9e3ac; /* Tea Green */
+  --input: #ffffff;
+  --ring: #90be6d;
+
+  --radius: 0.75rem;
+  --glass-bg: rgba(255, 255, 255, 0.9); 
+  --glass-border: rgba(55, 55, 31, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(55, 55, 31, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1c1917; /* Stone 900 */
+    --foreground: #fafaf9; /* Stone 50 */
+    
+    --primary: #34d399; /* Emerald 400 */
+    --primary-hover: #10b981;
+    --secondary: #292524; /* Stone 800 */
+    --secondary-foreground: #fafaf9;
+    
+    --accent: #a3e635; /* Lime 400 */
+    --accent-foreground: #1c1917;
+    
+    --muted: #44403c; /* Stone 700 */
+    --muted-foreground: #a8a29e; /* Stone 400 */
+    
+    --border: #44403c;
+    --input: #44403c;
+    --ring: #34d399;
+
+    --glass-bg: rgba(28, 25, 23, 0.7);
+    --glass-border: rgba(68, 64, 60, 0.4);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  background-image: url('/romania_map_subtle.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover; /* Fallback will just show the huge transparent map subtly */
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius);
+}
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius);
+}
+
+/* Base Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Generic Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #eaefbd; /* Cream text on dark button */
+  box-shadow: 0 4px 14px 0 rgba(55, 55, 31, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(55, 55, 31, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--muted);
+  transform: translateY(-2px);
+}
+
+/* Header Navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--foreground);
+}
+
+/* Utilities */
+.text-gradient {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.text-center { text-align: center; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mt-8 { margin-top: 2rem; }
+
+/* Main Layout */
+.main-content {
+  flex: 1;
+  padding: 3rem 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Forms */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--muted-foreground);
+}
+.form-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(234, 144, 16, 0.2);
+}
+.form-input::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.7;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
