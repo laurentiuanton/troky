@@ -26,27 +26,29 @@ async function Header() {
         </Link>
 
         {/* ACTIONS RIGHT */}
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2 md:gap-4">
           {user ? (
             <>
-              <Button asChild variant="default" className="font-bold bg-[#ea9010] hover:bg-[#d07f0e] text-white rounded-full px-6">
+              <Button asChild variant="default" className="font-bold bg-[#ea9010] hover:bg-[#d07f0e] text-white rounded-full px-4 md:px-6 h-10 md:h-11">
                 <Link href="/add">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Anunț Nou
+                  <PlusCircle className="h-4 w-4 md:mr-2" /> 
+                  <span className="hidden md:inline">Anunț Nou</span>
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="font-bold gap-2">
+              <Button asChild variant="ghost" className="font-bold gap-2 px-2 md:px-4">
                 <Link href="/profile">
-                  <User size={18} /> Contul Meu
+                  <User size={18} /> 
+                  <span className="hidden md:inline">Contul Meu</span>
                 </Link>
               </Button>
               <form action={logout}>
-                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive transition-colors">
-                  <LogOut size={16} className="mr-2" /> Ieșire
+                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive px-2">
+                  <LogOut size={16} />
                 </Button>
               </form>
             </>
           ) : (
-            <Button asChild variant="default" className="font-bold bg-[#37371f] hover:bg-[#202012] text-white rounded-full px-8">
+            <Button asChild variant="default" className="font-bold bg-[#37371f] hover:bg-[#202012] text-white rounded-full px-6 md:px-8">
               <Link href="/login">
                 <User className="mr-2 h-4 w-4" /> Autentificare
               </Link>

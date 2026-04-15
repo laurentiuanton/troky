@@ -45,78 +45,45 @@ export default async function Home() {
 
         {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE */}
         <div style={{ maxWidth: '850px', margin: '0 auto 4rem auto', position: 'relative' }}>
-          <form action="/search" style={{
-            display: 'flex',
-            background: 'var(--background)',
-            padding: '0.5rem',
-            borderRadius: '100px',
-            boxShadow: '0 12px 30px -10px rgba(55, 55, 31, 0.2)',
-            border: '2px solid var(--border)',
-            transition: 'all 0.3s ease',
-            alignItems: 'center'
-          }} className="search-bar-focus">
+          <form action="/search" className="flex flex-col md:flex-row items-stretch md:items-center bg-white/40 backdrop-blur-xl p-2 rounded-[2rem] md:rounded-full border-2 border-border shadow-xl focus-within:border-primary/30 transition-all gap-1">
+            
+            <div className="flex flex-col sm:flex-row flex-1 divide-y md:divide-y-0 md:divide-x divide-border/40">
+                {/* Category Side */}
+                <div className="flex items-center px-6 py-2 md:py-0 w-full md:w-[200px]">
+                <select
+                    name="category"
+                    className="bg-transparent border-none outline-none text-sm font-bold cursor-pointer w-full text-foreground"
+                >
+                    <option value="">Toate Categoriile</option>
+                    {categories?.map((c: any) => (
+                    <option key={c.id} value={c.slug}>
+                        {c.name}
+                    </option>
+                    ))}
+                </select>
+                </div>
 
-            {/* Category Side */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRight: '1px solid var(--border)', minWidth: '180px' }}>
-              <select
-                name="category"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: '0.95rem',
-                  color: 'var(--foreground)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  width: '100%'
-                }}
-              >
-                <option value="" style={{ color: '#000', background: '#fff' }}>Toate Categoriile</option>
-                {categories?.map((c: any) => (
-                  <option key={c.id} value={c.slug} style={{ color: '#000', background: '#fff' }}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Input Side */}
-            <div style={{ flex: 2, display: 'flex', alignItems: 'center', padding: '0 1.5rem' }}>
-              <Search size={20} style={{ color: 'var(--color-donez)', marginRight: '0.8rem', opacity: 0.8 }} />
-              <input
-                type="text"
-                name="q"
-                placeholder="Ce cauți astăzi pe Troky?"
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  background: 'transparent',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  color: 'var(--foreground)',
-                  fontWeight: 500
-                }}
-              />
+                {/* Input Side */}
+                <div className="flex-1 flex items-center px-6 py-3 md:py-0">
+                <Search size={18} className="text-secondary mr-3 opacity-60" />
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Ce cauți astăzi pe Troky?"
+                    className="flex-1 bg-transparent border-none outline-none text-sm font-semibold placeholder:text-muted-foreground/60"
+                />
+                </div>
             </div>
 
             {/* Submit Button */}
-            <button type="submit" className="btn btn-primary" style={{
-              borderRadius: '100px',
-              padding: '0.8rem 2.5rem',
-              fontSize: '1rem',
-              fontWeight: 700,
-              background: 'var(--primary)',
-              color: 'var(--background)',
-              boxShadow: '0 4px 15px rgba(55, 55, 31, 0.2)',
-              marginLeft: '0.5rem'
-            }}>
+            <button type="submit" className="w-full md:w-auto px-10 py-4 md:py-3.5 bg-primary text-white font-black rounded-[1.5rem] md:rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/20">
               Caută
             </button>
           </form>
         </div>
 
         {/* PRIMARY ACTIONS: BOLD COLORED CIRCLES */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '1.25rem', maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
           <Link href="/add" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.25rem', textAlign: 'center' }}>
             <div style={{ width: '64px', height: '64px', background: '#ea9010', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(234, 144, 16, 0.3)' }}>
               <PlusCircle size={32} />

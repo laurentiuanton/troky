@@ -88,6 +88,18 @@
   }
 }
 
+/* RESPONSIVE TYPE & SPACING */
+@media (max-width: 768px) {
+  h1 { font-size: 2.5rem !important; line-height: 1.1 !important; letter-spacing: -1px !important; }
+  .navbar { @apply py-2; }
+  .grid-mobile-2 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.8rem !important; }
+  .container { @apply px-4; }
+}
+
 html {
   @apply bg-background;
 }

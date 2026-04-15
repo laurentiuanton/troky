@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare } from 'lucide-react'
+import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare, ChevronLeft } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -156,10 +156,13 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
   }
 
   return (
-    <Card className="grid grid-cols-1 md:grid-cols-12 h-[750px] border-border shadow-2xl shadow-black/5 rounded-3xl overflow-hidden bg-background">
+    <Card className="grid grid-cols-1 md:grid-cols-12 h-[600px] md:h-[750px] border-border shadow-2xl shadow-black/5 rounded-3xl overflow-hidden bg-background">
       
       {/* SIDEBAR CONVERSATIONS (4/12) */}
-      <div className="md:col-span-4 border-r border-border flex flex-col bg-muted/5">
+      <div className={cn(
+        "md:col-span-4 border-r border-border flex flex-col bg-muted/5",
+        selectedChat ? "hidden md:flex" : "flex"
+      )}>
         <div className="p-6 border-b border-border bg-white/40 backdrop-blur-md">
             <h3 className="text-sm font-black tracking-widest uppercase mb-4">Mesaje Recente</h3>
             <div className="relative">
@@ -214,12 +217,23 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       </div>
 
       {/* CHAT AREA (8/12) */}
-      <div className="md:col-span-8 flex flex-col bg-white min-h-0 relative">
+      <div className={cn(
+        "md:col-span-8 flex flex-col bg-white min-h-0 relative",
+        !selectedChat ? "hidden md:flex" : "flex"
+      )}>
         {selectedChat ? (
           <>
             {/* CHAT HEADER */}
             <div className="flex-none p-4 border-b border-border flex items-center justify-between bg-white/80 backdrop-blur-md z-10 shadow-sm">
               <div className="flex items-center gap-3">
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="md:hidden mr-1 h-8 w-8" 
+                    onClick={() => setSelectedChat(null)}
+                >
+                    <ChevronLeft size={20} />
+                </Button>
                 <Avatar className="h-9 w-9 border border-border">
                     <AvatarFallback className="bg-[#10b981] text-white font-bold text-sm">
                         {selectedChat.other_user_name?.charAt(0)}
@@ -233,7 +247,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
                     </div>
                 </div>
               </div>
-              <Badge variant="outline" className="rounded-lg font-bold border-border bg-muted/20 text-[10px] uppercase px-3 py-1">
+              <Badge variant="outline" className="hidden sm:inline-flex rounded-lg font-bold border-border bg-muted/20 text-[10px] uppercase px-3 py-1">
                 {selectedChat.listing_title}
               </Badge>
             </div>
