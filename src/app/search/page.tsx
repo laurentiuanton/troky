@@ -91,7 +91,7 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
                             </SelectTrigger>
                             <SelectContent className="rounded-xl">
                                 <SelectItem value="all">Oriunde pe platformă</SelectItem>
-                                {allCategories?.map((c) => (
+                                {allCategories?.map((c: any) => (
                                     <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -117,7 +117,7 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
         <div className="lg:col-span-9">
           {listings && listings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {listings.map(listing => {
+              {listings.map((listing: any) => {
                 const primaryImage = listing.listing_images?.find((img: any) => img.is_primary)?.image_url 
                   || listing.listing_images?.[0]?.image_url 
                   || '/placeholder-item.jpg';

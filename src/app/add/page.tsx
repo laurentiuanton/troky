@@ -40,16 +40,16 @@ export default function AddListingPage() {
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return
-    const newImages = Array.from(files).map(file => ({
+    const newImages = Array.from(files).map((file: File) => ({
       file,
       preview: URL.createObjectURL(file)
     }))
-    setImages(prev => [...prev, ...newImages])
+    setImages((prev: any[]) => [...prev, ...newImages])
   }
 
   const removeImage = (index: number) => {
-    setImages(prev => {
-        const filtered = prev.filter((_, i) => i !== index)
+    setImages((prev: any[]) => {
+        const filtered = prev.filter((_: any, i: number) => i !== index)
         if (primaryIndex === index) setPrimaryIndex(0)
         else if (primaryIndex > index) setPrimaryIndex(primaryIndex - 1)
         return filtered
@@ -65,7 +65,7 @@ export default function AddListingPage() {
     formData.append('tip_anunt', tipAnunt)
     
     formData.delete('images')
-    images.forEach((img, i) => {
+    images.forEach((img: any, i: number) => {
         formData.append('images', img.file)
         if (i === primaryIndex) {
             formData.append('primary_image_name', img.file.name)
@@ -219,9 +219,9 @@ export default function AddListingPage() {
                     >
                         {images.length > 0 && (
                             <div className="flex flex-wrap gap-4 justify-center">
-                                {images.map((img, i) => (
+                                {images.map((img: any, i: number) => (
                                     <div key={i} className={`relative w-28 h-28 rounded-2xl overflow-hidden border-2 transition-all ${
-                                        i === primaryIndex ? 'border-[#ea9010] scale-110 shadow-lg' : 'border-border opacity-80 hover:opacity-100'
+                                        i === primaryIndex ? 'border-[#ea9010] scale-110 shadow shadow-black/20' : 'border-border opacity-80 hover:opacity-100'
                                     }`}>
                                         <img src={img.preview} className="w-full h-full object-cover" />
                                         <Button 

@@ -27,7 +27,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
         event: 'INSERT', 
         schema: 'public', 
         table: 'messages'
-      }, (payload) => {
+      }, (payload: any) => {
         const msg = payload.new
         if (msg.sender_id === currentUser.id || msg.receiver_id === currentUser.id) {
             updateSidebar(msg)
@@ -68,7 +68,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
             schema: 'public', 
             table: 'messages',
             filter: `listing_id=eq.${selectedChat.listing_id}`
-        }, (payload) => {
+        }, (payload: any) => {
             const msg = payload.new
             const isRelevant = 
                 (msg.sender_id === currentUser.id && msg.receiver_id === selectedChat.other_user_id) ||

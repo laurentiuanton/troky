@@ -165,7 +165,7 @@ export default async function Home() {
             <Link href="/search?type=donez" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter(l => l.tip_anunt === 'donatie').slice(0, 6).map(listing => (
+            {listings?.filter((l: any) => l.tip_anunt === 'donatie').slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
@@ -178,7 +178,7 @@ export default async function Home() {
             <Link href="/search?type=schimb" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter(l => l.tip_anunt === 'schimb').slice(0, 6).map(listing => (
+            {listings?.filter((l: any) => l.tip_anunt === 'schimb').slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
@@ -191,7 +191,7 @@ export default async function Home() {
             <Link href="/search?type=vreau" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter(l => l.tip_anunt === 'vreau').slice(0, 6).map(listing => (
+            {listings?.filter((l: any) => l.tip_anunt === 'vreau').slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
