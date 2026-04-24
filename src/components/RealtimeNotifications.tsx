@@ -10,11 +10,16 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
   const router = useRouter()
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+       console.log('Realtime: No userId provided')
+       return
+    }
 
     const supabase = createClient()
+    
+    console.log('Realtime: Subscribing for user', userId)
 
-    const channel = supabase.channel('realtime-messages')
+    const channel = supabase.channel(`user-notifications-${userId}`)
       .on(
         'postgres_changes',
         {
@@ -23,22 +28,27 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
           table: 'messages',
           filter: `receiver_id=eq.${userId}`
         },
-        async (payload: any) => {
-          // You could optionally ignore if the current path is the chat window with this specific user
-          // But as a global notification, we can just show it.
-          toast('Ai primit un mesaj nou! 💬', {
-            description: 'Intră în profil > Mesaje pentru a răspunde.',
+        (payload) => {
+          console.log('Realtime: New message received', payload)
+          
+          toast('Mesaj Nou! 💬', {
+            description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
             action: {
-              label: 'Vezi mesajul',
+              label: 'Răspunde',
               onClick: () => router.push('/profile?tab=mesaje')
             },
-            icon: <MessageCircle className="w-4 h-4 text-[#10b981]" />
+            closeButton: true,
+            duration: 10000, // Sta 10 secunde sa fie vizibil
+            icon: <MessageCircle className="w-5 h-5 text-primary" />
           })
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('Realtime Status:', status)
+      })
 
     return () => {
+      console.log('Realtime: Cleaning up subscription')
       supabase.removeChannel(channel)
     }
   }, [userId, router])
