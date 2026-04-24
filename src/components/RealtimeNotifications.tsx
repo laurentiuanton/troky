@@ -69,7 +69,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
       supabase.removeChannel(dbChannel)
       supabase.removeChannel(broadcastChannel)
     }
-  }, [userId, router, supabase])
+  }, [userId, router])
 
   return null
 }
