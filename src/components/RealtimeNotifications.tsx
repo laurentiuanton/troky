@@ -48,7 +48,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         console.log('Realtime Status:', status)
       })
 
