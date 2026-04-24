@@ -132,29 +132,32 @@ function ListingCard({ listing }: { listing: any }) {
     <div className="group relative flex flex-col">
       <Link href={`/listing/${listing.id}`} className="glass-panel hover-lift" style={{ borderRadius: '0.5rem', overflow: 'hidden', textDecoration: 'none', color: 'inherit', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
         <div style={{ height: '130px', width: '100%', background: `url(${primaryImage}) center/cover no-repeat`, borderBottom: '1px solid var(--border)', position: 'relative' }}>
-          <span style={{ position: 'absolute', top: '5px', left: '5px', fontSize: '0.55rem', padding: '0.1rem 0.4rem', borderRadius: '100px', background: listing.tip_anunt === 'donatie' ? 'var(--primary)' : listing.tip_anunt === 'vreau' ? 'var(--accent)' : 'var(--secondary)', color: listing.tip_anunt === 'schimb' ? 'var(--foreground)' : 'var(--background)', fontWeight: 800, textTransform: 'uppercase' }}>
+          <span style={{ position: 'absolute', top: '8px', left: '8px', fontSize: '0.55rem', padding: '0.2rem 0.5rem', borderRadius: '100px', background: listing.tip_anunt === 'donatie' ? 'rgba(16, 185, 129, 0.9)' : listing.tip_anunt === 'vreau' ? 'rgba(250, 204, 21, 0.9)' : 'rgba(59, 130, 246, 0.9)', color: '#000', fontWeight: 800, textTransform: 'uppercase', backdropFilter: 'blur(4px)', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
             {listing.tip_anunt === 'donatie' ? 'Gratuit' : listing.tip_anunt === 'vreau' ? 'Cerere' : 'Schimb'}
           </span>
+
+          {/* Seller Mini-Link Overlay - Repositioned to Top Right */}
+          <div 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = `/user/${listing.user_id}`;
+            }}
+            className="absolute top-2 right-2 z-20 hover:scale-110 transition-transform flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-1.5 py-1 rounded-full shadow-lg border border-white/40 cursor-pointer"
+          >
+            <div className="w-5 h-5 rounded-full bg-[#37371f] flex items-center justify-center text-[9px] font-black text-white overflow-hidden border border-white/20">
+              {listing.profiles?.avatar_url ? (
+                <img src={listing.profiles.avatar_url} className="w-full h-full object-cover" />
+              ) : (
+                listing.profiles?.full_name?.charAt(0) || 'U'
+              )}
+            </div>
+          </div>
         </div>
-        <div style={{ padding: '0.5rem', flex: 1 }}>
-          <h3 style={{ fontSize: '0.85rem', margin: '0 0 0.2rem 0', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.title}</h3>
-          <p style={{ fontSize: '0.7rem', color: 'var(--muted-foreground)', margin: 0 }}>📍 {listing.location}</p>
+        <div style={{ padding: '0.75rem', flex: 1 }}>
+          <h3 style={{ fontSize: '0.85rem', margin: '0 0 0.3rem 0', fontWeight: 800, color: '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.title}</h3>
+          <p style={{ fontSize: '0.7rem', color: '#666', margin: 0, fontWeight: 600 }}>📍 {listing.location}</p>
         </div>
-      </Link>
-      
-      {/* Seller Mini-Link Overlay */}
-      <Link 
-        href={`/user/${listing.user_id}`} 
-        className="absolute bottom-[35px] right-2 z-10 hover:scale-110 transition-transform flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full shadow-lg border border-white/40"
-      >
-        <div className="w-5 h-5 rounded-full bg-[#10b981] flex items-center justify-center text-[10px] font-black text-white overflow-hidden">
-          {listing.profiles?.avatar_url ? (
-            <img src={listing.profiles.avatar_url} className="w-full h-full object-cover" />
-          ) : (
-            listing.profiles?.full_name?.charAt(0) || 'U'
-          )}
-        </div>
-        <span className="text-[9px] font-black uppercase text-foreground">{listing.profiles?.full_name?.split(' ')[0] || 'Utilizator'}</span>
       </Link>
     </div>
   )
