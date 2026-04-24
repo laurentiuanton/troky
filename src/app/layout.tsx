@@ -6,6 +6,8 @@ import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { logout } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
+import { Toaster } from 'sonner'
+import { RealtimeNotifications } from '@/components/RealtimeNotifications'
 
 export const metadata: Metadata = {
   title: 'Troky - Platformă Premium de Barter & Schimburi',
@@ -88,6 +90,8 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer />
+        <Toaster position="top-right" richColors />
+        {user && <RealtimeNotifications userId={user.id} />}
       </body>
     </html>
   )
