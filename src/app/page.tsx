@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { PlusCircle, RefreshCw, HeartHandshake, Search } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
+import HomeSearchBar from '@/components/HomeSearchBar'
 import ListingCard from '@/components/ListingCard'
 
 // Enable revalidation for dynamic content
