@@ -162,7 +162,7 @@ export default async function RootLayout({
       <body suppressHydrationWarning className="flex flex-col min-h-screen">
         <div className="bg-map" />
         <Header />
-        <main className="main-content pt-28 md:pt-36">
+        <main className="main-content w-full pt-28 md:pt-36">
           {children}
         </main>
         <Footer />

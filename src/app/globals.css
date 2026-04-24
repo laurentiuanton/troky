@@ -68,8 +68,12 @@
     filter: sepia(0.2) saturate(0.5);
   }
 
+  .container {
+    @apply mx-auto px-4 md:px-6 lg:px-8;
+  }
+
   .main-content {
-    @apply relative z-10 flex-1;
+    @apply relative z-10 flex-1 w-full;
   }
 
   h1, h2, h3, h4, h5, h6 {
