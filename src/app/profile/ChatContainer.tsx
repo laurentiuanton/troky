@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare, ChevronLeft, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { Card } from "@/components/ui/card"
@@ -246,11 +247,13 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
             <div className="flex-none p-4 border-b border-border flex items-center justify-between bg-white/80 backdrop-blur-md z-10 shadow-sm">
               <div className="flex items-center gap-3">
                 <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSelectedChat(null)}><ChevronLeft size={20} /></Button>
-                <Avatar className="h-9 w-9"><AvatarFallback className="bg-[#10b981] text-white font-bold">{selectedChat.other_user_name?.charAt(0)}</AvatarFallback></Avatar>
-                <div>
-                    <h4 className="font-bold text-sm">{selectedChat.other_user_name}</h4>
-                    <span className="text-[10px] font-black uppercase text-muted-foreground tracking-tighter">Conexiune activă</span>
-                </div>
+                <Link href={`/user/${selectedChat.other_user_id}`} className="flex items-center gap-3 group">
+                   <Avatar className="h-9 w-9 transition-transform group-hover:scale-105"><AvatarFallback className="bg-[#10b981] text-white font-bold">{selectedChat.other_user_name?.charAt(0)}</AvatarFallback></Avatar>
+                   <div>
+                       <h4 className="font-bold text-sm group-hover:text-[#10b981] transition-colors">{selectedChat.other_user_name}</h4>
+                       <span className="text-[10px] font-black uppercase text-muted-foreground tracking-tighter hover:underline">Vezi profil public</span>
+                   </div>
+                </Link>
               </div>
             </div>
 

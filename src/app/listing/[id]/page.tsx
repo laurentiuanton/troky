@@ -118,22 +118,22 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
           {/* CONTACT & PROFIL */}
           <Card className="border-border shadow-2xl shadow-black/5 overflow-hidden">
             <CardHeader className="bg-muted/30 border-b border-border/40">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+              <Link href={`/user/${listing.user_id}`} className="flex items-center gap-4 group transition-all">
+                <Avatar className="h-12 w-12 border-2 border-white shadow-sm transition-transform group-hover:scale-105">
                   <AvatarImage src={listing.profiles?.avatar_url} />
                   <AvatarFallback className="bg-[#10b981] text-white">
                     <User size={20} />
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-black text-lg text-foreground leading-none mb-1">
+                  <h4 className="font-black text-lg text-foreground leading-none mb-1 group-hover:text-[#10b981] transition-colors">
                     {listing.profiles?.full_name || 'Utilizator Troky'}
                   </h4>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
                     Pe platformă din {listing.profiles?.created_at ? new Date(listing.profiles.created_at).getFullYear() : new Date().getFullYear()}
                   </p>
                 </div>
-              </div>
+              </Link>
             </CardHeader>
             <CardContent className="p-6">
               {!user ? (
