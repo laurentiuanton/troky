@@ -176,13 +176,13 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       const filePath = `chat/${currentUser.id}/${fileName}`
 
       const { data, error } = await supabase.storage
-        .from('listing-images') // Folosim bucket-ul existent
+        .from('anunturi') // Folosim bucket-ul oficial
         .upload(filePath, file)
 
       if (error) throw error
 
       const { data: { publicUrl } } = supabase.storage
-        .from('listing-images')
+        .from('anunturi')
         .getPublicUrl(filePath)
 
       await handleSendMessage(null, publicUrl)
