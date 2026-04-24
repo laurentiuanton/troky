@@ -21,6 +21,11 @@ export async function createListing(formData: FormData) {
   const tip_anunt = formData.get('tip_anunt') as string 
   const stare_produs = formData.get('stare_produs') as string
   const location = formData.get('location') as string
+  const latField = formData.get('lat') as string
+  const lngField = formData.get('lng') as string
+  const lat = latField ? parseFloat(latField) : null
+  const lng = lngField ? parseFloat(lngField) : null
+  
   const ce_doresc_la_schimb = formData.get('ce_doresc_la_schimb') as string || null
   const images = formData.getAll('images') as File[]
   const primaryImageName = formData.get('primary_image_name') as string
@@ -46,6 +51,8 @@ export async function createListing(formData: FormData) {
       tip_anunt,
       stare_produs,
       location,
+      lat,
+      lng,
       ce_doresc_la_schimb,
       category_id,
       user_id: user.id

@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { createListing } from './actions'
 import { ImagePlus, Loader2, Star, Trash2, Info } from 'lucide-react'
+
+const MapLocationPicker = dynamic(() => import('@/components/MapLocationPicker'), { ssr: false, loading: () => <div className="h-[300px] w-full bg-muted/20 animate-pulse rounded-2xl border-2 border-border/50"></div> })
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,6 +32,9 @@ export default function AddListingPage() {
   const [images, setImages] = useState<{file: File, preview: string}[]>([])
   const [primaryIndex, setPrimaryIndex] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [lat, setLat] = useState<number | null>(null)
+  const [lng, setLng] = useState<number | null>(null)
+  const [locationText, setLocationText] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -182,14 +188,22 @@ export default function AddListingPage() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-3">
-                        <Label className="font-bold text-sm tracking-wide">Locație *</Label>
-                        <Input 
-                            name="location" 
-                            required 
-                            className="h-12 rounded-xl bg-muted/10 border-border font-medium" 
-                            placeholder="Oraș, Județ" 
-                        />
+                    <div className="space-y-3 md:col-span-2">
+                        <Label className="font-bold text-sm tracking-wide">Locație exactă pe hartă *</Label>
+                        <p className="text-xs text-muted-foreground font-semibold">Cumpărătorii de pe Troky adoră schimburile locale. Caută un oraș și plasează pin-ul.</p>
+                        <input type="hidden" name="location" value={locationText} />
+                        <input type="hidden" name="lat" value={lat || ''} />
+                        <input type="hidden" name="lng" value={lng || ''} />
+                        
+                        <div className="p-1 rounded-2xl bg-white border border-border/60 shadow-sm overflow-hidden">
+                          <MapLocationPicker 
+                            onChange={(newLat, newLng, newAddress) => {
+                              setLat(newLat)
+                              setLng(newLng)
+                              setLocationText(newAddress)
+                            }}
+                          />
+                        </div>
                     </div>
                 </div>
 
