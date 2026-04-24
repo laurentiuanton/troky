@@ -58,8 +58,8 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
           const convKey = `${msg.listing_id}-${otherId}`
           
           if (!convMap.has(convKey)) {
-            const p = profiles?.find(p => p.id === otherId)
-            const l = listings?.find(l => l.id === msg.listing_id)
+            const p = profiles?.find((p: any) => p.id === otherId)
+            const l = listings?.find((l: any) => l.id === msg.listing_id)
             
             convMap.set(convKey, {
               listing_id: msg.listing_id,
