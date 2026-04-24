@@ -59,33 +59,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
       })
     }
 
-    // CANAL 1: BAZĂ DE DATE (ASCULTĂM TABELUL)
-    const dbChannel = supabase.channel(`user-db-${userId}`)
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'messages'
-      }, async (payload: any) => {
-          console.log('🔔 DB Change detectat:', payload)
-          if (payload.new.receiver_id === userId) {
-            // Aflăm numele expeditorului rapid
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('full_name')
-              .eq('id', payload.new.sender_id)
-              .single()
-            
-            showNotification(
-              payload.new.content, 
-              profile?.full_name || 'Utilizator Troky', 
-              payload.new.listing_id, 
-              payload.new.sender_id
-            )
-          }
-      })
-      .subscribe((status: any) => console.log('🔔 DB Channel Status:', status))
-
-    // CANAL 2: BROADCAST (PING INSTANT)
+    // CANAL: BROADCAST (PING INSTANT)
     const broadcastChannel = supabase.channel('global-notifications')
       .on('broadcast', { event: 'new-message' }, (payload: any) => {
           console.log('🔔 Broadcast primit:', payload)
@@ -101,8 +75,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
       .subscribe((status: any) => console.log('🔔 Broadcast Status:', status))
 
     return () => {
-      console.log('🔔 Realtime: Curățăm subscripțiile')
-      supabase.removeChannel(dbChannel)
+      console.log('🔔 Realtime: Curățăm subscripția')
       supabase.removeChannel(broadcastChannel)
     }
   }, [userId, router])

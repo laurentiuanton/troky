@@ -21,8 +21,13 @@ export function MessagesBadge({ userId, initialCount }: { userId: string, initia
       })
       .subscribe()
 
+    // 2. Ascultăm evenimente locale de refresh (pentru viteză instantanee)
+    const handleRefresh = () => updateCount()
+    window.addEventListener('unread-count-refresh', handleRefresh)
+
     return () => {
       supabase.removeChannel(channel)
+      window.removeEventListener('unread-count-refresh', handleRefresh)
     }
   }, [userId])
 

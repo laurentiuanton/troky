@@ -44,13 +44,18 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
     if (!chat || !currentUser || document.visibilityState !== 'visible') return
     
     console.log('📖 Încercăm marcarea ca citit...')
-    await supabase
+    const { error } = await supabase
       .from('messages')
       .update({ read_state: true })
       .eq('listing_id', chat.listing_id)
       .eq('receiver_id', currentUser.id)
       .eq('sender_id', chat.other_user_id)
       .eq('read_state', false)
+
+    if (!error) {
+      // Notificăm toate badge-urile să se actualizeze instant
+      window.dispatchEvent(new Event('unread-count-refresh'))
+    }
   }
 
   // 3. Subscription pentru mesaje noi și statusuri citite
@@ -151,7 +156,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
           event: 'new-message',
           payload: { 
             receiver_id: selectedChat.other_user_id, 
-            sender_name: currentUser.full_name || 'Cineva',
+            sender_name: currentUser.full_name || currentUser.email?.split('@')[0] || 'Utilizator',
             content: text ? text : '📷 A trimis o imagine',
             listing_id: selectedChat.listing_id,
             sender_id: currentUser.id
@@ -171,7 +176,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       const filePath = `chat/${currentUser.id}/${fileName}`
 
       const { data, error } = await supabase.storage
-        .from('listing-images') // Folosim bucket-ul existent garantat
+        .from('listing-images') // Folosim bucket-ul existent
         .upload(filePath, file)
 
       if (error) throw error
@@ -183,7 +188,7 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       await handleSendMessage(null, publicUrl)
     } catch (err) {
       console.error('Error uploading image:', err)
-      alert('Eroare la încărcarea imaginii. Verifică dacă bucket-ul "chat-attachments" există.')
+      alert('Eroare la încărcarea imaginii. Te rugăm să încerci din nou.')
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
