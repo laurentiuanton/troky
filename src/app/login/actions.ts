@@ -34,6 +34,8 @@ export async function signup(formData: FormData) {
   const fullName = formData.get('fullName') as string
   const username = formData.get('username') as string
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
   // Note: fullName goes into raw_user_meta_data to trigger our SQL handle_new_user profile creation
   const { error } = await supabase.auth.signUp({
     email,
@@ -42,7 +44,8 @@ export async function signup(formData: FormData) {
       data: {
         full_name: fullName,
         username: username,
-      }
+      },
+      emailRedirectTo: `${siteUrl}/auth/callback`,
     }
   })
 
@@ -50,8 +53,8 @@ export async function signup(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  // Nu mai facem direct redirect pentru că utilizatorul trebuie să-și confirme contul pe email.
+  return { success: 'Contul a fost creat! Te rugăm să verifici adresa de email (inclusiv folderul Spam) și să accesezi link-ul de confirmare.' }
 }
 
 export async function logout(formData?: FormData) {
