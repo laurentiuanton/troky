@@ -103,7 +103,7 @@ export default function HomeSearchBar() {
     <div ref={searchRef} className="w-full max-w-5xl mx-auto mb-16 px-4">
       <form 
         onSubmit={(e) => handleSearch(e)} 
-        className="flex flex-col lg:flex-row items-stretch bg-white/60 backdrop-blur-3xl rounded-[2.5rem] lg:rounded-full border-2 border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.1)] focus-within:shadow-[0_25px_60px_rgba(0,0,0,0.15)] focus-within:bg-white transition-all overflow-hidden relative z-50 ring-1 ring-black/5"
+        className="flex flex-col lg:flex-row items-stretch bg-white/60 backdrop-blur-3xl rounded-[2rem] lg:rounded-full border-2 border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.1)] focus-within:shadow-[0_25px_60px_rgba(0,0,0,0.15)] focus-within:bg-white transition-all relative z-50 ring-1 ring-black/5"
       >
         
         {/* 1. QUERY BOX */}
