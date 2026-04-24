@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare, ChevronLeft } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,6 +20,22 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+  const searchParams = useSearchParams()
+
+  // 0. Auto-deschidere chat din URL (Notificare)
+  useEffect(() => {
+    const listingId = searchParams.get('listingId')
+    const otherUserId = searchParams.get('userId')
+    
+    if (listingId && otherUserId && conversations.length > 0) {
+      const foundChat = conversations.find(c => 
+        c.listing_id === listingId && c.other_user_id === otherUserId
+      )
+      if (foundChat) {
+        setSelectedChat(foundChat)
+      }
+    }
+  }, [searchParams, conversations])
 
   useEffect(() => {
     const sidebarChannel = supabase
