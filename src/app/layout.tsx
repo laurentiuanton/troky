@@ -46,11 +46,6 @@ async function Header() {
           <nav className="flex items-center gap-3 md:gap-5">
             {user ? (
               <>
-                <Button asChild variant="ghost" className="hidden lg:flex font-black text-[10px] tracking-widest uppercase hover:text-secondary group transition-all px-4">
-                  <Link href="/search" className="flex items-center gap-2">
-                    <Search size={16} className="group-hover:rotate-12 transition-transform" /> Caută
-                  </Link>
-                </Button>
 
                 <Button asChild className="hidden sm:flex font-black bg-accent hover:bg-accent/90 text-white rounded-[1.2rem] h-10 md:h-12 px-6 shadow-lg shadow-accent/20 hover:scale-105 active:scale-95 transition-all">
                   <Link href="/add">
