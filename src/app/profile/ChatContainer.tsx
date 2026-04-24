@@ -57,20 +57,36 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
     })
   }
 
+  // 1. Marcare mesaje ca citite
+  const markAsRead = async (chat: any) => {
+    if (!chat) return
+    const { error } = await supabase
+      .from('messages')
+      .update({ read_state: true })
+      .eq('listing_id', chat.listing_id)
+      .eq('receiver_id', currentUser.id)
+      .eq('sender_id', chat.other_user_id)
+      .eq('read_state', false)
+    
+    if (!error) {
+      // Opțional: Update sidebar local
+    }
+  }
+
   useEffect(() => {
     if (selectedChat) {
       fetchMessages(selectedChat)
+      markAsRead(selectedChat)
       
       const chatChannel = supabase
         .channel(`chat_room_${selectedChat.listing_id}`)
+        // Ascultăm MESAJE NOI
         .on('postgres_changes', { 
             event: 'INSERT', 
             schema: 'public', 
             table: 'messages',
         }, (payload: any) => {
             const msg = payload.new
-            
-            // Verificăm dacă mesajul aparține acestei conversații specifice
             const isForThisListing = msg.listing_id === selectedChat.listing_id
             const isBetweenUsers = 
                 (msg.sender_id === currentUser.id && msg.receiver_id === selectedChat.other_user_id) ||
@@ -78,24 +94,32 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
             
             if (isForThisListing && isBetweenUsers) {
                 setMessages(prev => {
-                    // Evităm duplicatele (dacă mesajul a fost deja adăugat optimist)
                     if (prev.some(m => m.id === msg.id)) return prev
-                    
-                    // Înlocuim mesajul optimist (starea 'sending') cu cel real de la server
                     const tempIndex = prev.findIndex(m => m.temp_id && m.content === msg.content)
                     if (tempIndex > -1) {
                         const newMsgs = [...prev]
                         newMsgs[tempIndex] = msg
                         return newMsgs
                     }
-                    
                     return [...prev, msg]
                 })
+
+                // Dacă suntem în chat, îl marcăm imediat ca citit
+                if (msg.receiver_id === currentUser.id) {
+                   markAsRead(selectedChat)
+                }
             }
         })
-        .subscribe((status: any) => {
-            console.log("Realtime status:", status)
+        // Ascultăm când sunt CITITE (UPDATE) pentru bife albastre
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages'
+        }, (payload: any) => {
+            const updatedMsg = payload.new
+            setMessages(prev => prev.map(m => m.id === updatedMsg.id ? updatedMsg : m))
         })
+        .subscribe()
 
       return () => { supabase.removeChannel(chatChannel) }
     }
@@ -136,11 +160,13 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
       listing_id: selectedChat.listing_id,
       content: msgContent,
       created_at: new Date().toISOString(),
-      status: 'sending' 
+      status: 'sending',
+      read_state: false
     }
     
     setMessages(prev => [...prev, optimisticMsg])
 
+    // Trimitem mesajul
     const { data, error } = await supabase.from('messages').insert({
         sender_id: currentUser.id,
         receiver_id: selectedChat.other_user_id,
@@ -152,6 +178,17 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
         setMessages(prev => prev.filter(m => m.id !== tempId))
     } else {
         setMessages(prev => prev.map(m => m.id === tempId ? { ...data, status: 'sent' } : m))
+        
+        // BROADCAST NOTIFICATION (FAST PING)
+        supabase.channel('global-notifications').send({
+          type: 'broadcast',
+          event: 'new-message',
+          payload: { 
+            receiver_id: selectedChat.other_user_id, 
+            sender_name: currentUser.full_name || 'Cineva',
+            content: msgContent
+          }
+        })
     }
   }
 

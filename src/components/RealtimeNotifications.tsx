@@ -19,42 +19,53 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
     
     console.log('Realtime: Subscribing for user', userId)
 
-    const channel = supabase.channel(`user-notifications-${userId}`)
+    // CANAL 1: DATABASE CHANGES (BACKUP & PERSISTENT)
+    const dbChannel = supabase.channel(`user-db-messages-${userId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages'
-          // Am scos filtrul de aici :)
         },
         (payload: any) => {
-          console.log('Realtime: Payload primit:', payload)
-          
-          // Filtram manual aici in cod
-          if (payload.new.receiver_id === userId) {
-            console.log('Realtime: Mesajul este pentru noi! Afisam toast.')
-            
-            toast('Mesaj Nou! 💬', {
-              description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
-              action: {
-                label: 'Răspunde',
-                onClick: () => router.push('/profile?tab=mesaje')
-              },
-              closeButton: true,
-              duration: 10000,
-              icon: <MessageCircle className="w-5 h-5 text-primary" />
-            })
+          if (payload.new.receiver_id === userId && !payload.new.read_state) {
+            showNotification(payload.new.content, 'Mesaj Nou! 💬')
           }
         }
       )
-      .subscribe((status: any) => {
-        console.log('Realtime Status:', status)
+      .subscribe()
+
+    // CANAL 2: BROADCAST (INSTANT PING)
+    const broadcastChannel = supabase.channel('global-notifications')
+      .on(
+        'broadcast',
+        { event: 'new-message' },
+        (payload: any) => {
+          if (payload.payload.receiver_id === userId) {
+             showNotification(payload.payload.content, `Mesaj de la ${payload.payload.sender_name} 💬`)
+          }
+        }
+      )
+      .subscribe()
+
+    const showNotification = (content: string, title: string) => {
+      // Evităm duplicarea dacă avem deja un toast deschis (opțional)
+      toast(title, {
+        description: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+        action: {
+          label: 'Răspunde',
+          onClick: () => router.push('/profile?tab=mesaje')
+        },
+        closeButton: true,
+        duration: 8000,
+        icon: <MessageCircle className="w-5 h-5 text-primary" />
       })
+    }
 
     return () => {
-      console.log('Realtime: Cleaning up subscription')
-      supabase.removeChannel(channel)
+      supabase.removeChannel(dbChannel)
+      supabase.removeChannel(broadcastChannel)
     }
   }, [userId, router])
 
