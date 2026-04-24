@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { FollowButton } from "../FollowButton"
 
 export default async function PublicProfilePage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
+
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
 
   // 1. Fetch User Profile
   const { data: profile } = await supabase
@@ -21,6 +24,18 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
     .single()
 
   if (!profile) return notFound()
+
+  // 2. Fetch Follow status
+  let isFollowing = false
+  if (currentUser) {
+    const { data: followData } = await supabase
+      .from('followers')
+      .select('*')
+      .eq('follower_id', currentUser.id)
+      .eq('following_id', id)
+      .maybeSingle()
+    isFollowing = !!followData
+  }
 
   // 2. Fetch User Listings
   const { data: listings } = await supabase
@@ -62,9 +77,11 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
               </div>
 
               <div className="flex gap-3">
-                 <Button className="rounded-2xl h-12 px-8 bg-[#37371f] hover:bg-black font-bold shadow-xl transition-all">
-                    Urmărește
-                 </Button>
+                 <FollowButton 
+                    followingId={id} 
+                    isInitialFollowing={isFollowing} 
+                    currentUserId={currentUser?.id} 
+                 />
               </div>
            </div>
         </Card>
