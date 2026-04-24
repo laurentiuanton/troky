@@ -39,11 +39,11 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
     }
   }, [searchParams, conversations])
 
-  // 2. Marcare mesaje ca citite (DOAR când conversația este selectată)
+  // 2. Marcare mesaje ca citite (DOAR când conversația este activă pe ecran)
   const markAsRead = async (chat: any) => {
-    if (!chat || !currentUser) return
-    console.log('📖 Marcăm mesajele ca citite pentru chat-ul:', chat.listing_title)
+    if (!chat || !currentUser || document.visibilityState !== 'visible') return
     
+    console.log('📖 Încercăm marcarea ca citit...')
     await supabase
       .from('messages')
       .update({ read_state: true })
@@ -57,7 +57,11 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
   useEffect(() => {
     if (selectedChat) {
       fetchMessages(selectedChat)
-      markAsRead(selectedChat)
+      
+      // Marcăm ca citit DOAR dacă suntem pe pagină
+      if (document.visibilityState === 'visible') {
+        markAsRead(selectedChat)
+      }
       
       const chatChannel = supabase
         .channel(`chat_room_${selectedChat.listing_id}`)
@@ -78,7 +82,8 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
                     return [...prev, msg]
                 })
 
-                if (msg.receiver_id === currentUser.id) {
+                // Marcăm ca citit DOAR dacă utilizatorul chiar se uită la chat în acel moment
+                if (msg.receiver_id === currentUser.id && document.visibilityState === 'visible') {
                    markAsRead(selectedChat)
                 }
             }
@@ -93,7 +98,18 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
         })
         .subscribe()
 
-      return () => { supabase.removeChannel(chatChannel) }
+      // 3.1. Ascultăm când utilizatorul revine în tab (tab focus)
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && selectedChat) {
+          markAsRead(selectedChat)
+        }
+      }
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+
+      return () => { 
+        supabase.removeChannel(chatChannel)
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
     }
   }, [selectedChat, currentUser.id])
 
