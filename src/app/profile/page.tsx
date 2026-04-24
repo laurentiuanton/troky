@@ -6,6 +6,7 @@ import { Package, MessageSquare, Settings, LogOut, MapPin, ShieldCheck, User as 
 import { logout } from '@/app/login/actions'
 import { Button } from "@/components/ui/button"
 import { MessagesBadge } from '@/components/MessagesBadge' 
+import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
