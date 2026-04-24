@@ -28,7 +28,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
           table: 'messages'
           // Am scos filtrul de aici :)
         },
-        (payload) => {
+        (payload: any) => {
           console.log('Realtime: Payload primit:', payload)
           
           // Filtram manual aici in cod
