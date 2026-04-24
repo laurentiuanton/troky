@@ -151,7 +151,7 @@ export default async function HomePage(props: { searchParams: Promise<{ q?: stri
                 >
                     Toate
                 </Link>
-                {allCategories?.map((cat) => (
+                {allCategories?.map((cat: any) => (
                     <Link 
                         key={cat.id}
                         href={`/?category=${cat.slug}&q=${queryText}&type=${listingType}`}
