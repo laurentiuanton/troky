@@ -3,10 +3,8 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { MapPin, Clock, Tag, User, MessageCircle, AlertCircle, Calendar } from 'lucide-react'
 import { notFound } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import ProductGallery from './ProductGallery'
-
-const MapLocationView = dynamic(() => import('@/components/MapLocationView'), { ssr: false, loading: () => <div className="w-full h-[250px] md:h-[350px] bg-muted/20 animate-pulse rounded-2xl border-2 border-border/50"></div> })
+import DynamicMapLocationView from '@/components/DynamicMapLocationView'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -112,7 +110,7 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
              <div className="space-y-3 p-1">
                <h3 className="text-sm font-black tracking-widest text-[#000] uppercase flex items-center gap-2"><MapPin size={16} className="text-[#10b981]"/> Zona Aproximativă</h3>
                <div className="rounded-3xl overflow-hidden border-2 border-border/60 shadow-lg relative z-0 h-[250px]">
-                  <MapLocationView lat={listing.lat} lng={listing.lng} radiusMarker={true} zoom={14} />
+                  <DynamicMapLocationView lat={listing.lat} lng={listing.lng} radiusMarker={true} zoom={14} />
                </div>
              </div>
           )}
