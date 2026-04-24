@@ -53,7 +53,7 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
         const { data: profiles } = await supabase.from('profiles').select('id, full_name').in('id', otherUserIds)
         const { data: listings } = await supabase.from('listings').select('id, title').in('id', listingIds)
 
-        rawMessages.forEach((msg) => {
+        rawMessages.forEach((msg: any) => {
           const otherId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id
           const convKey = `${msg.listing_id}-${otherId}`
           
