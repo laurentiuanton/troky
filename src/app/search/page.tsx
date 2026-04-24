@@ -11,7 +11,7 @@ import SearchFiltersSidebar from '@/components/SearchFiltersSidebar'
 
 export const revalidate = 0;
 
-export default async function SearchPage(props: { searchParams: Promise<{ q?: string, category?: string }> }) {
+export default async function SearchPage(props: { searchParams: Promise<{ q?: string, category?: string, lat?: string, lng?: string, radius?: string }> }) {
   const searchParams = await props.searchParams
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
