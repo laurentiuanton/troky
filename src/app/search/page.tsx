@@ -93,23 +93,19 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* FILTERS SIDEBAR (3/12) */}
-        <div className="lg:col-span-4 xl:col-span-3">
-            <SearchFiltersSidebar 
-                initialQuery={queryText}
-                initialCategory={categorySlug || 'all'}
-                initialType={listingType}
-                allCategories={allCategories || []}
-                initialLat={userLat || undefined}
-                initialLng={userLng || undefined}
-                initialRadius={radius}
-            />
-        </div>
+      {/* NEW TOP FILTERS BAR */}
+      <SearchFiltersSidebar 
+          initialQuery={queryText}
+          initialCategory={categorySlug || 'all'}
+          initialType={listingType}
+          allCategories={allCategories || []}
+          initialLat={userLat || undefined}
+          initialLng={userLng || undefined}
+          initialRadius={radius}
+      />
 
-        {/* RESULTS GRID (9/12) */}
-        <div className="lg:col-span-8 xl:col-span-9">
+      {/* RESULTS GRID */}
+      <div>
           {listings && listings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {listings.map((listing: any) => {
@@ -173,7 +169,6 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
                 </Button>
             </Card>
           )}
-        </div>
       </div>
     </div>
   )
