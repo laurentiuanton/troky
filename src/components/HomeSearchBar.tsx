@@ -24,6 +24,12 @@ export default function HomeSearchBar() {
   const searchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (query.trim().length === 0) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
     const timer = setTimeout(async () => {
       if (query.trim().length >= 2) {
         setIsQueryLoading(true)
@@ -31,11 +37,8 @@ export default function HomeSearchBar() {
         setSuggestions(results)
         setShowSuggestions(true)
         setIsQueryLoading(false)
-      } else {
-        setSuggestions([])
-        setShowSuggestions(false)
       }
-    }, 300)
+    }, 200) // Mai rapid: 200ms
     return () => clearTimeout(timer)
   }, [query])
 

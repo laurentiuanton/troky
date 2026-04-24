@@ -10,18 +10,24 @@ export async function getAutocompleteSuggestions(query: string): Promise<string[
     const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
-    const { data, error } = await supabase
+    const words = query.trim().split(/\s+/).filter(w => w.length > 0)
+    let queryBuilder = supabase
       .from('listings')
       .select('title')
-      .ilike('title', `%${query}%`)
       .eq('is_active', true)
-      .limit(6)
+
+    // Construim o căutare pentru fiecare cuvânt (ordinea nu mai contează)
+    words.forEach(word => {
+      queryBuilder = queryBuilder.ilike('title', `%${word}%`)
+    })
+
+    const { data, error } = await queryBuilder.limit(10)
 
     if (error) throw error
 
-    // Return unique titles
-    const titles = data.map((item: { title: string }) => item.title)
-    return Array.from(new Set(titles))
+    // Returnăm titluri unice și le curățăm
+    const titles = data.map((item: { title: string }) => item.title.trim())
+    return Array.from(new Set(titles)).slice(0, 6)
   } catch (err) {
     console.error('Autocomplete error:', err)
     return []
