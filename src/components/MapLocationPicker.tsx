@@ -40,16 +40,15 @@ function LocationMarker({ position, setPosition, setAddressName }: any) {
     }
   }
 
-  // Cand primeste pozitie noua din prop (de ex search), face fly to
-  useEffect(() => {
-    if (position) {
-      map.flyTo(position, map.getZoom())
-    }
-  }, [position, map])
-
   return position === null ? null : (
     <Marker position={position}></Marker>
   )
+}
+
+function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
+  const map = useMap();
+  map.flyTo(center, zoom);
+  return null;
 }
 
 export default function MapLocationPicker({
@@ -79,7 +78,7 @@ export default function MapLocationPicker({
     if (!searchQuery) return
     setIsSearching(true)
     try {
-      const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`, {
+      const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&addressdetails=1`, {
         headers: { 'Accept-Language': 'ro' }
       })
       const data = await resp.json()
@@ -132,6 +131,7 @@ export default function MapLocationPicker({
 
       <div className="w-full h-[300px] md:h-[400px] rounded-2xl overflow-hidden border-2 border-border/60 shadow-inner relative z-0">
         <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
+          <ChangeView center={position} zoom={13} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
