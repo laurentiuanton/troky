@@ -84,14 +84,6 @@ export default async function Home() {
 
         {/* PRIMARY ACTIONS: BOLD COLORED CIRCLES */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
-          <Link href="/add" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.25rem', textAlign: 'center' }}>
-            <div style={{ width: '64px', height: '64px', background: '#ea9010', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(234, 144, 16, 0.3)' }}>
-              <PlusCircle size={32} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Adaugă</h3>
-            </div>
-          </Link>
 
           <Link href="/add?type=donez" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', borderRadius: '1.25rem', textAlign: 'center' }}>
             <div style={{ width: '64px', height: '64px', background: '#10b981', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}>
