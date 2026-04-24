@@ -11,9 +11,6 @@ export default async function Home() {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
-  // Fetch categories
-  const { data: categories } = await supabase.from('categories').select('*').order('name', { ascending: true })
-
   // Fetch active listings grouped by category (simple approach: fetch all active, then group mapped in React)
   // For production with massive rows, pagination or RPC is preferred.
   const { data: listings } = await supabase
@@ -45,7 +42,7 @@ export default async function Home() {
         </p>
 
         {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE WITH AUTOCOMPLETE */}
-        <HomeSearchBar categories={categories || []} />
+        <HomeSearchBar />
 
         {/* PRIMARY ACTIONS: BOLD COLORED CIRCLES */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
