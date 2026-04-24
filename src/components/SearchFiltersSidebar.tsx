@@ -73,8 +73,8 @@ export default function SearchFiltersSidebar({
           .limit(3)
 
         const combined = [
-          ...(categories?.map(c => ({ ...c, isCategory: true })) || []),
-          ...(listings?.map(l => ({ ...l, isListing: true })) || [])
+          ...(categories?.map((c: any) => ({ ...c, isCategory: true })) || []),
+          ...(listings?.map((l: any) => ({ ...l, isListing: true })) || [])
         ]
         setSuggestions(combined)
       } catch (error) {
