@@ -83,7 +83,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
             )
           }
       })
-      .subscribe((status) => console.log('🔔 DB Channel Status:', status))
+      .subscribe((status: any) => console.log('🔔 DB Channel Status:', status))
 
     // CANAL 2: BROADCAST (PING INSTANT)
     const broadcastChannel = supabase.channel('global-notifications')
@@ -98,7 +98,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
              )
           }
       })
-      .subscribe((status) => console.log('🔔 Broadcast Status:', status))
+      .subscribe((status: any) => console.log('🔔 Broadcast Status:', status))
 
     return () => {
       console.log('🔔 Realtime: Curățăm subscripțiile')
