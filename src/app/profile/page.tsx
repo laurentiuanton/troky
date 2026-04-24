@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { Package, MessageSquare, Settings, LogOut, MapPin, ShieldCheck, User as UserIcon } from 'lucide-react'
 import { logout } from '@/app/login/actions'
 import { Button } from "@/components/ui/button"
+import { MessagesBadge } from '@/components/MessagesBadge' 
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
@@ -25,6 +26,11 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
   // Fetch initial safe data
   const { data: myListings } = await supabase.from('listings').select('*, listing_images(image_url, is_primary)').eq('user_id', user.id).order('created_at', { ascending: false })
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
+
+  // Fetch Unread Count Safely
+  let unreadCount = 0
+  const { count } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('read_state', false)
+  unreadCount = count || 0
 
   return (
     <div className="container max-w-7xl py-12 px-4 animate-fade-in relative z-10">
@@ -52,7 +58,13 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
             <Card className="border-border shadow-2xl rounded-3xl overflow-hidden p-2 bg-white">
                 <nav className="flex flex-col gap-1">
                     <SidebarLink href="/profile?tab=anunturi" icon={<Package size={18} />} label="Anunțurile Mele" isActive={activeTab === 'anunturi'} />
-                    <SidebarLink href="/profile?tab=mesaje" icon={<MessageSquare size={18} />} label="Mesaje" isActive={activeTab === 'mesaje'} />
+                    <SidebarLink 
+                        href="/profile?tab=mesaje" 
+                        icon={<MessageSquare size={18} />} 
+                        label="Mesaje" 
+                        isActive={activeTab === 'mesaje'} 
+                        customBadge={<MessagesBadge userId={user.id} initialCount={unreadCount} />}
+                    />
                     <SidebarLink href="/profile?tab=setari" icon={<Settings size={18} />} label="Setările Contului" isActive={activeTab === 'setari'} />
                 </nav>
                 <Separator className="my-2 bg-border/40" />
@@ -103,7 +115,7 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
   )
 }
 
-function SidebarLink({ href, icon, label, isActive }: { href: string, icon: any, label: string, isActive: boolean }) {
+function SidebarLink({ href, icon, label, isActive, customBadge }: { href: string, icon: any, label: string, isActive: boolean, customBadge?: React.ReactNode }) {
     return (
         <Button asChild variant="ghost" className={cn(
             "w-full justify-start font-bold gap-3 px-4 py-6 rounded-2xl transition-all",
@@ -111,6 +123,7 @@ function SidebarLink({ href, icon, label, isActive }: { href: string, icon: any,
         )}>
             <Link href={href} className="w-full flex items-center gap-3">
                 {icon} <span className="flex-1 text-left">{label}</span>
+                {customBadge}
             </Link>
         </Button>
     )
