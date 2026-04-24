@@ -20,103 +20,112 @@ export default async function Home() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="container animate-fade-in">
-      <section style={{ textAlign: 'center', padding: '5rem 0 6rem 0' }}>
-        <h1 style={{
-          fontSize: '3.6rem',
-          marginBottom: '2rem',
-          letterSpacing: '-1.5px',
-          background: 'linear-gradient(to right, #ea9010, #10b981, #3b82f6, #facc15)',
-          color: '#000',
-          display: 'inline-block',
-          padding: '1rem 3rem',
-          borderRadius: '1.25rem',
-          fontWeight: 900,
-          boxShadow: '0 15px 35px rgba(0,0,0,0.12)',
-          border: '2px solid rgba(255,255,255,0.2)'
-        }}>
-          Dăruiește. Schimbă. Reciclează.
-        </h1>
-        <p style={{ fontSize: '1.9rem', color: '#1a1a10', maxWidth: '850px', margin: '0 auto 3.5rem', fontFamily: "'Dancing Script', cursive", fontWeight: 700, lineHeight: '1.2' }}>
-          „Aici, banii n-au valoare, singura plată acceptată este strângerea de mână.”
-        </p>
+    <div className="min-h-screen bg-[#fcfcf9]">
+      {/* 🌟 HERO SECTION: THE HEART OF TROKY */}
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-36 px-4 overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[50%] bg-[#10b981]/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[0%] right-[-5%] w-[30%] h-[40%] bg-[#ea9010]/10 blur-[100px] rounded-full" />
+        
+        <div className="container max-w-6xl mx-auto text-center relative z-10 space-y-8">
+          <div className="space-y-4">
+            <Badge className="bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 border-none font-black uppercase tracking-[0.2em] text-[10px] py-1.5 px-4 mb-4">
+               Comunitatea #1 de Troc din România
+            </Badge>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[0.95]">
+              Dăruiește. <span className="text-[#10b981]">Schimbă.</span><br/>
+              Reciclează.
+            </h1>
+          </div>
+          
+          <p className="text-xl md:text-3xl text-[#37371f]/60 max-w-2xl mx-auto font-medium italic leading-snug">
+            „Aici, banii n-au valoare, singura plată acceptată este <span className="text-foreground font-black underline decoration-[#ea9010] decoration-4 underline-offset-4">strângerea de mână</span>.”
+          </p>
 
-        {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE WITH AUTOCOMPLETE */}
-        <HomeSearchBar />
+          {/* SEARCH BAR INTEGRATION */}
+          <div className="max-w-3xl mx-auto pt-4">
+             <HomeSearchBar />
+          </div>
 
-        {/* PRIMARY ACTIONS: BOLD COLORED CIRCLES */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
-
-          <Link href="/add?type=donez" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', borderRadius: '1.25rem', textAlign: 'center' }}>
-            <div style={{ width: '64px', height: '64px', background: '#10b981', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}>
-              <HeartHandshake size={32} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Donez</h3>
-            </div>
-          </Link>
-
-          <Link href="/add?type=schimb" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', borderRadius: '1.25rem', textAlign: 'center' }}>
-            <div style={{ width: '64px', height: '64px', background: '#3b82f6', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
-              <RefreshCw size={32} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Schimb</h3>
-            </div>
-          </Link>
-
-          <Link href="/add?type=vreau" className="glass-panel hover-lift" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1.5rem', borderRadius: '1.25rem', textAlign: 'center' }}>
-            <div style={{ width: '64px', height: '64px', background: '#facc15', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(250, 204, 21, 0.3)' }}>
-              <Search size={32} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#000', fontWeight: 900, lineHeight: '1.2', textTransform: 'uppercase', letterSpacing: '1px' }}>Vreau</h3>
-            </div>
-          </Link>
+          {/* PRIMARY ACTIONS: PREMIUM GLASS CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto pt-10">
+            {[
+              { href: "/add?type=donez", label: "Donez", icon: <HeartHandshake size={32} />, color: "#10b981", bg: "bg-[#10b981]/5" },
+              { href: "/add?type=schimb", label: "Schimb", icon: <RefreshCw size={32} />, color: "#3b82f6", bg: "bg-[#3b82f6]/5" },
+              { href: "/add?type=vreau", label: "Vreau", icon: <Search size={32} />, color: "#facc15", bg: "bg-[#facc15]/5" }
+            ].map((action) => (
+              <Link 
+                key={action.label}
+                href={action.href} 
+                className={`group relative overflow-hidden glass-panel ${action.bg} border-border/40 p-8 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}
+              >
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-12"
+                  style={{ background: action.color, color: '#fff', boxShadow: `0 10px 25px ${action.color}44` }}
+                >
+                  {action.icon}
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-[0.15em] text-foreground transition-colors group-hover:text-foreground/70">{action.label}</h3>
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <PlusCircle size={18} className="text-foreground/30" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* SECTIONS BY TYPE: DONEZ, SCHIMB, VREAU */}
-      <section style={{ padding: '1rem 0', display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+      {/* 📦 LISTINGS SECTIONS */}
+      <section className="container max-w-6xl mx-auto px-4 pb-32 space-y-20">
+        
+        {/* SECTION MAPPING */}
+        {[
+          { type: "donatie", title: "🎁 Cele mai noi Donații", color: "text-[#10b981]", border: "border-[#10b981]/30", link: "/search?type=donez" },
+          { type: "schimb", title: "🔄 Schimburi Active", color: "text-[#3b82f6]", border: "border-[#3b82f6]/30", link: "/search?type=schimb" },
+          { type: "vreau", title: "🔍 Cereri din Comunitate", color: "text-[#ea9010]", border: "border-[#ea9010]/30", link: "/search?type=vreau" }
+        ].map((sec) => (
+          <div key={sec.type} className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+            <div className="flex items-end justify-between px-2">
+              <div className="space-y-1">
+                <h2 className={`text-2xl md:text-4xl font-black tracking-tight ${sec.color}`}>
+                  {sec.title}
+                </h2>
+                <div className={`h-1 w-20 rounded-full bg-current opacity-20`} />
+              </div>
+              <Link 
+                href={sec.link} 
+                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors py-2 px-6 border border-border/60 rounded-full flex items-center gap-2 hover:bg-white"
+              >
+                Vezi Colecția <RefreshCw size={10} />
+              </Link>
+            </div>
 
-        {/* SECTION: DONEZ */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--primary)', paddingBottom: '0.3rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--foreground)', margin: 0 }}>🎁 Donez</h2>
-            <Link href="/search?type=donez" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8">
+              {listings?.filter((l: any) => l.tip_anunt === sec.type).slice(0, 3).map((listing: any) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter((l: any) => l.tip_anunt === 'donatie').slice(0, 6).map((listing: any) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        </div>
+        ))}
 
-        {/* SECTION: SCHIMB */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--secondary)', paddingBottom: '0.3rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--foreground)', margin: 0 }}>🔄 Schimb</h2>
-            <Link href="/search?type=schimb" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter((l: any) => l.tip_anunt === 'schimb').slice(0, 6).map((listing: any) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        </div>
-
-        {/* SECTION: VREAU */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--accent)', paddingBottom: '0.3rem', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--foreground)', margin: 0 }}>🔍 Vreau</h2>
-            <Link href="/search?type=vreau" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>Vezi tot</Link>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-            {listings?.filter((l: any) => l.tip_anunt === 'vreau').slice(0, 6).map((listing: any) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        </div>
+        {/* CTA SECTION */}
+        <Card className="bg-[#37371f] rounded-[4rem] p-12 md:p-20 text-center space-y-8 overflow-hidden relative border-none shadow-3xl group">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-150" />
+           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24 transition-transform duration-700 group-hover:scale-150" />
+           
+           <h2 className="text-4xl md:text-6xl font-black text-white leading-tight relative z-10">
+              Ai ceva ce nu mai folosești? <br/>
+              <span className="text-[#10b981]">Dă-i o viață nouă pe Troky.</span>
+           </h2>
+           <div className="relative z-10 pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button asChild className="h-16 px-10 rounded-2xl bg-[#10b981] hover:bg-[#0d9668] text-[#37371f] font-black text-lg shadow-xl">
+                 <Link href="/add">Postează un Anunț Gratuit</Link>
+              </Button>
+              <Button asChild variant="outline" className="h-16 px-10 rounded-2xl border-white/20 text-white hover:bg-white/10 font-bold text-lg">
+                 <Link href="/search">Explorează Comunitatea</Link>
+              </Button>
+           </div>
+        </Card>
 
       </section>
     </div>
