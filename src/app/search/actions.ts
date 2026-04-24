@@ -20,7 +20,7 @@ export async function getAutocompleteSuggestions(query: string) {
     if (error) throw error
 
     // Return unique titles
-    const titles = data.map(item => item.title)
+    const titles = data.map((item: { title: string }) => item.title)
     return Array.from(new Set(titles))
   } catch (err) {
     console.error('Autocomplete error:', err)
