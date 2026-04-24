@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { login, signup, resetPassword } from './actions'
 import { createClient } from '@/utils/supabase/client'
-import { Mail, Lock, User, AtSign, ArrowRight, ArrowLeft, ShieldCheck, Heart, Sparkles } from 'lucide-react'
+import { Mail, Lock, User, AtSign, ArrowRight, ArrowLeft, ShieldCheck, Heart, Sparkles, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
