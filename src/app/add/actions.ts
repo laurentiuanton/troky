@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createListing(formData: FormData) {
@@ -94,5 +93,5 @@ export async function createListing(formData: FormData) {
   }
 
   revalidatePath('/')
-  redirect(`/profile`) // Redirect to dashboard to see the new listing
+  return { success: true }
 }

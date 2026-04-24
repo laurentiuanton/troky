@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { createListing } from './actions'
 import { ImagePlus, Loader2, Star, Trash2, Info } from 'lucide-react'
@@ -26,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function AddListingPage() {
+  const router = useRouter()
   const [tipAnunt, setTipAnunt] = useState('schimb')
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -83,6 +85,8 @@ export default function AddListingPage() {
       if (result && result.error) {
         setErrorMsg(result.error)
         setLoading(false)
+      } else if (result && result.success) {
+        router.push('/profile?tab=anunturi')
       }
     } catch (err) {
       setErrorMsg('Eroare server. Încearcă din nou.')
