@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 
-export async function getAutocompleteSuggestions(query: string) {
+export async function getAutocompleteSuggestions(query: string): Promise<string[]> {
   if (!query || query.length < 2) return []
 
   try {
