@@ -16,32 +16,42 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
     const supabase = createClient()
     
     const showNotification = (content: string, senderName: string, listingId?: string, otherUserId?: string) => {
-      toast(senderName + " 💬", {
-        description: (
-          <div className="mt-2 space-y-3">
-             <p className="text-sm font-semibold italic text-foreground/80 leading-snug">"{content}"</p>
-             <div className="flex gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    const url = listingId && otherUserId 
-                      ? `/profile?tab=mesaje&listingId=${listingId}&userId=${otherUserId}`
-                      : `/profile?tab=mesaje`
-                    router.push(url)
-                  }}
-                  className="px-4 py-2 bg-primary text-white text-[10px] font-black uppercase rounded-full shadow-lg"
-                >
-                  Răspunde
-                </button>
-             </div>
+      toast.custom((t: any) => (
+        <div 
+          onClick={() => {
+            const url = listingId && otherUserId 
+              ? `/profile?tab=mesaje&listingId=${listingId}&userId=${otherUserId}`
+              : `/profile?tab=mesaje`
+            router.push(url)
+            toast.dismiss(t.id)
+          }}
+          className={cn(
+            "cursor-pointer w-[92vw] max-w-md bg-white/80 backdrop-blur-3xl border border-white/20 shadow-[0_15px_40px_rgba(0,0,0,0.12)] rounded-[2.5rem] p-4 flex items-center gap-4 transition-all duration-500 transform active:scale-95",
+            t.visible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          )}
+        >
+          {/* iOS Style Avatar */}
+          <div className="shrink-0 w-12 h-12 rounded-full bg-gradient-to-tr from-primary/10 to-[#10b981]/20 flex items-center justify-center border border-primary/10 overflow-hidden shadow-inner">
+             <div className="text-primary font-black text-lg">{senderName.charAt(0).toUpperCase()}</div>
           </div>
-        ),
-        duration: 15000,
-        className: "bg-white/95 backdrop-blur-xl border-2 border-primary/10 p-5 rounded-[1.5rem] shadow-2xl",
-        icon: (
-           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-black text-lg shadow-lg">
-             {senderName.charAt(0).toUpperCase()}
-           </div>
-        )
+
+          {/* iOS Style Content */}
+          <div className="flex-1 min-w-0 pr-2">
+            <div className="flex items-center justify-between">
+               <span className="text-[11px] font-black uppercase tracking-widest text-[#10b981] mb-0.5">WhatsApp • Troky</span>
+               <span className="text-[9px] font-bold text-muted-foreground/60 uppercase">Acum</span>
+            </div>
+            <h4 className="text-sm font-black text-foreground leading-tight truncate">{senderName}</h4>
+            <p className="text-sm font-medium text-muted-foreground truncate leading-tight mt-0.5">
+              {content}
+            </p>
+          </div>
+
+          {/* Indication of more */}
+          <div className="w-1 h-8 bg-muted-foreground/10 rounded-full shrink-0" />
+        </div>
+      ), {
+        duration: 12000
       })
     }
 

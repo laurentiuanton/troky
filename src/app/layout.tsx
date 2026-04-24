@@ -95,7 +95,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer />
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-center" richColors />
         {user && <RealtimeNotifications userId={user.id} />}
       </body>
     </html>
