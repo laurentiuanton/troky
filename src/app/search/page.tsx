@@ -6,14 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import SearchFiltersSidebar from '@/components/SearchFiltersSidebar'
 
 export const revalidate = 0;
 
@@ -35,22 +29,43 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
     }
   }
 
-  let dbQuery = supabase
-    .from('listings')
-    .select('*, categories(name), listing_images(image_url, is_primary)')
-    .eq('is_active', true)
-    
-  if (categoryId) {
-    dbQuery = dbQuery.eq('category_id', categoryId);
+  const userLat = searchParams.lat ? parseFloat(searchParams.lat) : null;
+  const userLng = searchParams.lng ? parseFloat(searchParams.lng) : null;
+  const radius = searchParams.radius ? parseFloat(searchParams.radius) : 15; // default 15km
+
+  let listings = [];
+
+  if (userLat && userLng) {
+     // Radius search
+     const { data } = await supabase.rpc('search_listings_by_radius', {
+        user_lat: userLat,
+        user_lng: userLng,
+        radius_km: radius,
+        search_query: queryText,
+        search_category: categorySlug === 'all' ? '' : categorySlug
+     }).select('*, categories(name), listing_images(image_url, is_primary)')
+       .order('created_at', { ascending: false });
+       
+     listings = data || [];
+  } else {
+     // Standard Search
+     let dbQuery = supabase
+       .from('listings')
+       .select('*, categories(name), listing_images(image_url, is_primary)')
+       .eq('is_active', true)
+       
+     if (categoryId) {
+       dbQuery = dbQuery.eq('category_id', categoryId);
+     }
+   
+     if (queryText) {
+       dbQuery = dbQuery.ilike('title', `%${queryText}%`);
+     }
+   
+     dbQuery = dbQuery.order('created_at', { ascending: false });
+     const { data } = await dbQuery;
+     listings = data || [];
   }
-
-  if (queryText) {
-    dbQuery = dbQuery.ilike('title', `%${queryText}%`);
-  }
-
-  dbQuery = dbQuery.order('created_at', { ascending: false });
-
-  const { data: listings } = await dbQuery;
   const { data: allCategories } = await supabase.from('categories').select('*').order('name');
 
   return (
@@ -69,52 +84,19 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* FILTERS SIDEBAR (3/12) */}
-        <div className="lg:col-span-3">
-          <Card className="border-border shadow-2xl shadow-black/5 rounded-3xl overflow-hidden sticky top-24">
-            <CardHeader className="bg-muted/10 border-b border-border/40 p-6">
-                <CardTitle className="text-sm font-black tracking-widest uppercase flex items-center gap-2">
-                    <Filter size={16} className="text-[#ea9010]" /> Filtrează Căutarea
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-                <form action="/search" className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cuvânt cheie</label>
-                        <Input name="q" defaultValue={queryText} placeholder="Ce dorești să cauți?" className="h-11 rounded-xl bg-muted/10 border-border font-medium" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Categorie</label>
-                        <Select name="category" defaultValue={categorySlug}>
-                            <SelectTrigger className="h-11 rounded-xl bg-muted/10 border-border font-bold">
-                                <SelectValue placeholder="Oriunde pe platformă" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl">
-                                <SelectItem value="all">Oriunde pe platformă</SelectItem>
-                                {allCategories?.map((c: any) => (
-                                    <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex flex-col gap-2 pt-2">
-                        <Button type="submit" className="w-full bg-[#37371f] hover:bg-[#202012] text-white font-bold h-11 rounded-xl">
-                            Aplică filtrele
-                        </Button>
-                        {(queryText || categorySlug) && (
-                            <Button asChild variant="ghost" className="w-full font-bold h-11 rounded-xl text-muted-foreground hover:bg-muted/50">
-                                <Link href="/search">Resetează</Link>
-                            </Button>
-                        )}
-                    </div>
-                </form>
-            </CardContent>
-          </Card>
+        <div className="lg:col-span-4 xl:col-span-3">
+            <SearchFiltersSidebar 
+                initialQuery={queryText}
+                initialCategory={categorySlug || 'all'}
+                allCategories={allCategories || []}
+                initialLat={userLat || undefined}
+                initialLng={userLng || undefined}
+                initialRadius={radius}
+            />
         </div>
 
         {/* RESULTS GRID (9/12) */}
-        <div className="lg:col-span-9">
+        <div className="lg:col-span-8 xl:col-span-9">
           {listings && listings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {listings.map((listing: any) => {
