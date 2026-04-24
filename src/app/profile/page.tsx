@@ -47,8 +47,8 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
         const convMap = new Map()
         
         // Luăm ID-urile unice pentru lookup-uri rapide ulterior
-        const otherUserIds = Array.from(new Set(rawMessages.map(m => m.sender_id === user.id ? m.receiver_id : m.sender_id)))
-        const listingIds = Array.from(new Set(rawMessages.map(m => m.listing_id)))
+        const otherUserIds = Array.from(new Set(rawMessages.map((m: any) => m.sender_id === user.id ? m.receiver_id : m.sender_id)))
+        const listingIds = Array.from(new Set(rawMessages.map((m: any) => m.listing_id)))
 
         const { data: profiles } = await supabase.from('profiles').select('id, full_name').in('id', otherUserIds)
         const { data: listings } = await supabase.from('listings').select('id, title').in('id', listingIds)
