@@ -100,7 +100,7 @@ export default async function HomePage(props: { searchParams: Promise<{ q?: stri
         </div>
 
         {/* SEARCH BAR & FILTERS SIDEBAR */}
-        <div className="sticky top-24 z-30 mb-20 group">
+        <div className="sticky top-24 z-30 mb-12 group">
             <SearchFiltersSidebar 
                 initialQuery={queryText}
                 initialCategory={categorySlug || 'all'}
@@ -110,6 +110,63 @@ export default async function HomePage(props: { searchParams: Promise<{ q?: stri
                 initialLng={userLng || undefined}
                 initialRadius={radius}
             />
+        </div>
+
+        {/* QUICK POST ACTIONS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 px-2">
+            {[
+                { title: 'Propune un Schimb', desc: 'Schimbă lucrurile tale pe ceva util', type: 'schimb', color: 'bg-primary', icon: <ArrowRight className="h-5 w-5" /> },
+                { title: 'Donează cu drag', desc: 'Oferă gratuit celor care au nevoie', type: 'donatie', color: 'bg-secondary', icon: <Sparkles className="h-5 w-5" /> },
+                { title: 'Caut un Trok', desc: 'Vrei ceva anume? Postează o cerere', type: 'vreau', color: 'bg-accent', icon: <SearchIcon className="h-5 w-5" /> }
+            ].map((action, idx) => (
+                <Link key={idx} href={`/add?type=${action.type}`} className="group relative overflow-hidden rounded-[2.5rem] bg-white border border-white/40 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-black/10 transition-all p-8 flex items-center justify-between group-hover:-translate-y-1">
+                    <div className="space-y-1">
+                        <h4 className="text-lg font-black italic tracking-tight leading-none">{action.title}</h4>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{action.desc}</p>
+                    </div>
+                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white scale-90 group-hover:scale-100 transition-transform shadow-lg", action.color)}>
+                        {action.icon}
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                </Link>
+            ))}
+        </div>
+
+        {/* CATEGORY BAR */}
+        <div className="mb-14 px-2">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="h-[1px] flex-1 bg-border/40" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/50 px-4">Categorii Populare</span>
+                <div className="h-[1px] flex-1 bg-border/40" />
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+                <Link 
+                    href="/?category=all"
+                    className={cn(
+                        "px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.1em] transition-all duration-300 border",
+                        (categorySlug === 'all' || !categorySlug) 
+                            ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105" 
+                            : "bg-white text-muted-foreground border-border/40 hover:border-secondary/50 hover:text-secondary"
+                    )}
+                >
+                    Toate
+                </Link>
+                {allCategories?.map((cat) => (
+                    <Link 
+                        key={cat.id}
+                        href={`/?category=${cat.slug}&q=${queryText}&type=${listingType}`}
+                        className={cn(
+                            "px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.1em] transition-all duration-300 border flex items-center gap-2",
+                            categorySlug === cat.slug
+                                ? "bg-secondary text-white border-secondary shadow-xl shadow-secondary/20 scale-105" 
+                                : "bg-white text-muted-foreground border-border/40 hover:border-secondary/50 hover:text-secondary"
+                        )}
+                    >
+                        <Tag size={12} className={categorySlug === cat.slug ? "text-white" : "text-secondary/50"} />
+                        {cat.name}
+                    </Link>
+                ))}
+            </div>
         </div>
 
         {/* RESULTS GRID */}
