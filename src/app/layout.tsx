@@ -64,9 +64,14 @@ async function Header() {
 
 function Footer() {
     return (
-      <footer style={{ borderTop: '1px solid var(--border)', padding: '2rem 0', marginTop: 'auto', textAlign: 'center', color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>
-        <div className="container">
-          <p>&copy; {new Date().getFullYear()} Troky. Toate drepturile rezervate.</p>
+      <footer className="border-t border-border py-12 mt-auto text-center text-muted-foreground text-sm">
+        <div className="container space-y-4">
+          <div className="flex flex-wrap justify-center gap-6 font-bold uppercase tracking-widest text-[10px]">
+            <Link href="/search" className="hover:text-primary transition-colors">Caută Anunțuri</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">Politică de Confidențialitate</Link>
+            <Link href="/login" className="hover:text-primary transition-colors">Autentificare</Link>
+          </div>
+          <p className="font-medium text-xs">&copy; {new Date().getFullYear()} Troky. Barter Premium în România.</p>
         </div>
       </footer>
     )
