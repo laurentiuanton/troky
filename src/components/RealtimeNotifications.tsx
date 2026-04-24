@@ -25,22 +25,27 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${userId}`
+          table: 'messages'
+          // Am scos filtrul de aici :)
         },
         (payload) => {
-          console.log('Realtime: New message received', payload)
+          console.log('Realtime: Payload primit:', payload)
           
-          toast('Mesaj Nou! 💬', {
-            description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
-            action: {
-              label: 'Răspunde',
-              onClick: () => router.push('/profile?tab=mesaje')
-            },
-            closeButton: true,
-            duration: 10000, // Sta 10 secunde sa fie vizibil
-            icon: <MessageCircle className="w-5 h-5 text-primary" />
-          })
+          // Filtram manual aici in cod
+          if (payload.new.receiver_id === userId) {
+            console.log('Realtime: Mesajul este pentru noi! Afisam toast.')
+            
+            toast('Mesaj Nou! 💬', {
+              description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
+              action: {
+                label: 'Răspunde',
+                onClick: () => router.push('/profile?tab=mesaje')
+              },
+              closeButton: true,
+              duration: 10000,
+              icon: <MessageCircle className="w-5 h-5 text-primary" />
+            })
+          }
         }
       )
       .subscribe((status) => {
