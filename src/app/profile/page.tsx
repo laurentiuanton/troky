@@ -7,6 +7,7 @@ import { logout } from '@/app/login/actions'
 import { deleteListing } from './actions'
 import { ClientPasswordUpdate } from './ClientPasswordUpdate'
 import ChatContainer from './ChatContainer'
+import { MessagesBadge } from './MessagesBadge'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -44,6 +45,13 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
     .select('*')
     .eq('id', user.id)
     .single()
+
+  // Fetch Unread Messages Count
+  const { count: unreadCount } = await supabase
+    .from('messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('receiver_id', user.id)
+    .eq('read_state', false)
 
   // Fetch Conversations for the Chat tab
   let conversations: any[] = []
@@ -118,6 +126,7 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
                         icon={<MessageSquare size={18} />} 
                         label="Mesaje" 
                         isActive={activeTab === 'mesaje'} 
+                        customBadge={<MessagesBadge userId={user.id} initialCount={unreadCount || 0} />}
                     />
                     <SidebarLink 
                         href="/profile?tab=setari" 
@@ -251,15 +260,15 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
   )
 }
 
-function SidebarLink({ href, icon, label, count, isActive }: { href: string, icon: any, label: string, count?: number, isActive: boolean }) {
+function SidebarLink({ href, icon, label, count, isActive, customBadge }: { href: string, icon: any, label: string, count?: number, isActive: boolean, customBadge?: React.ReactNode }) {
     return (
         <Button asChild variant="ghost" className={`w-full justify-start font-bold gap-3 px-4 py-6 rounded-2xl transition-all ${
             isActive ? 'bg-[#10b981]/10 text-[#10b981] shadow-sm' : 'text-foreground/70 hover:bg-muted/50'
         }`}>
-            <Link href={href}>
+            <Link href={href} className="w-full flex items-center gap-3">
                 {icon}
                 <span className="flex-1 text-left">{label}</span>
-                {count !== undefined && <Badge className="ml-auto bg-muted font-black text-[10px]">{count}</Badge>}
+                {customBadge ? customBadge : (count !== undefined && <Badge className="ml-auto bg-muted font-black text-[10px]">{count}</Badge>)}
             </Link>
         </Button>
     )
