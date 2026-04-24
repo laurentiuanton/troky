@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import HomeSearchBar from '@/components/HomeSearchBar'
 import ListingCard from '@/components/ListingCard'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 // Enable revalidation for dynamic content
 export const revalidate = 0;
@@ -29,9 +31,9 @@ export default async function Home() {
         
         <div className="container max-w-6xl mx-auto text-center relative z-10 space-y-8">
           <div className="space-y-4">
-            <Badge className="bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 border-none font-black uppercase tracking-[0.2em] text-[10px] py-1.5 px-4 mb-4">
+            <div className="inline-block bg-[#10b981]/10 text-[#10b981] border-none font-black uppercase tracking-[0.2em] text-[9px] py-2 px-5 mb-4 rounded-full">
                Comunitatea #1 de Troc din România
-            </Badge>
+            </div>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-foreground leading-[0.95]">
               Dăruiește. <span className="text-[#10b981]">Schimbă.</span><br/>
               Reciclează.
