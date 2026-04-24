@@ -8,6 +8,7 @@ import { logout } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
 import { Toaster } from 'sonner'
 import { RealtimeNotifications } from '@/components/RealtimeNotifications'
+import { MessagesBadge } from '@/components/MessagesBadge'
 
 export const metadata: Metadata = {
   title: 'Troky - Platformă Premium de Barter & Schimburi',
@@ -18,6 +19,16 @@ async function Header() {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
   const { data: { user } } = await supabase.auth.getUser()
+
+  let unreadCount = 0
+  if (user) {
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', user.id)
+      .eq('read_state', false)
+    unreadCount = count || 0
+  }
 
   return (
     <header className="navbar border-b-2 border-primary/10 bg-background/80 backdrop-blur-md sticky top-0 z-50">
@@ -37,10 +48,11 @@ async function Header() {
                   <span className="hidden md:inline">Anunț Nou</span>
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="font-bold gap-2 px-2 md:px-4">
+              <Button asChild variant="ghost" className="font-bold gap-2 px-2 md:px-4 relative group">
                 <Link href="/profile">
-                  <User size={18} /> 
+                  <User size={18} className="group-hover:text-[#10b981] transition-colors" /> 
                   <span className="hidden md:inline">Contul Meu</span>
+                  <MessagesBadge userId={user.id} initialCount={unreadCount} />
                 </Link>
               </Button>
               <form action={logout}>

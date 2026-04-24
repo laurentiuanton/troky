@@ -7,7 +7,7 @@ import { logout } from '@/app/login/actions'
 import { deleteListing } from './actions'
 import { ClientPasswordUpdate } from './ClientPasswordUpdate'
 import ChatContainer from './ChatContainer'
-import { MessagesBadge } from './MessagesBadge'
+import { MessagesBadge } from '@/components/MessagesBadge'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
