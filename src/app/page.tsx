@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { PlusCircle, RefreshCw, HeartHandshake, Search } from 'lucide-react'
+import { PlusCircle, RefreshCw, HeartHandshake } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
+import HomeSearchBar from '@/components/HomeSearchBar'
 
 // Enable revalidation for dynamic content
 export const revalidate = 0;
@@ -43,44 +44,8 @@ export default async function Home() {
           „Aici, banii n-au valoare, singura plată acceptată este strângerea de mână.”
         </p>
 
-        {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE */}
-        <div style={{ maxWidth: '850px', margin: '0 auto 4rem auto', position: 'relative' }}>
-          <form action="/search" className="flex flex-col md:flex-row items-stretch md:items-center bg-white/40 backdrop-blur-xl p-2 rounded-[2rem] md:rounded-full border-2 border-border shadow-xl focus-within:border-primary/30 transition-all gap-1">
-            
-            <div className="flex flex-col sm:flex-row flex-1 divide-y md:divide-y-0 md:divide-x divide-border/40">
-                {/* Category Side */}
-                <div className="flex items-center px-6 py-2 md:py-0 w-full md:w-[200px]">
-                <select
-                    name="category"
-                    className="bg-transparent border-none outline-none text-sm font-bold cursor-pointer w-full text-foreground"
-                >
-                    <option value="">Toate Categoriile</option>
-                    {categories?.map((c: any) => (
-                    <option key={c.id} value={c.slug}>
-                        {c.name}
-                    </option>
-                    ))}
-                </select>
-                </div>
-
-                {/* Input Side */}
-                <div className="flex-1 flex items-center px-6 py-3 md:py-0">
-                <Search size={18} className="text-secondary mr-3 opacity-60" />
-                <input
-                    type="text"
-                    name="q"
-                    placeholder="Ce cauți astăzi pe Troky?"
-                    className="flex-1 bg-transparent border-none outline-none text-sm font-semibold placeholder:text-muted-foreground/60"
-                />
-                </div>
-            </div>
-
-            {/* Submit Button */}
-            <button type="submit" className="w-full md:w-auto px-10 py-4 md:py-3.5 bg-primary text-white font-black rounded-[1.5rem] md:rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/20">
-              Caută
-            </button>
-          </form>
-        </div>
+        {/* PREMIUM SEARCH BAR: AIRBNB STYLE ADAPTIVE WITH AUTOCOMPLETE */}
+        <HomeSearchBar categories={categories || []} />
 
         {/* PRIMARY ACTIONS: BOLD COLORED CIRCLES */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
