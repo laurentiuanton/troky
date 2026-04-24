@@ -75,8 +75,7 @@ export default function MapLocationPicker({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, addressName])
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSearch = async () => {
     if (!searchQuery) return
     setIsSearching(true)
     try {
@@ -105,7 +104,7 @@ export default function MapLocationPicker({
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-2">
+      <div className="flex flex-col md:flex-row gap-2">
         <div className="relative flex-1">
           <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
@@ -113,17 +112,19 @@ export default function MapLocationPicker({
             placeholder="Caută orașul / cartierul / strada..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
             className="w-full h-12 pl-10 rounded-xl bg-muted/20 border-2 border-border font-medium focus:outline-none focus:border-primary/50"
           />
         </div>
         <button 
-          type="submit" 
+          type="button" 
+          onClick={handleSearch}
           disabled={isSearching}
           className="h-12 px-6 bg-primary text-white font-bold rounded-xl flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-transform whitespace-nowrap shadow-md shadow-primary/20"
         >
           {isSearching ? 'Caut...' : 'Setează'}
         </button>
-      </form>
+      </div>
       
       <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1">
         Sau alege direct punând un "📍 Pin" pe hartă pentru o acuratețe mare.
