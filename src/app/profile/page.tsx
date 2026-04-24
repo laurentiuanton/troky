@@ -9,9 +9,7 @@ import { MessagesBadge } from '@/components/MessagesBadge'
 import { Badge } from "@/components/ui/badge"
 import { ClientPasswordUpdate } from './ClientPasswordUpdate'
 import ChatContainer from './ChatContainer'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/avatar" // Wait, fixed path below
-import { Avatar as AvatarRoot, AvatarFallback as Fallback, AvatarImage as Image } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -88,12 +86,12 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
             <Sparkles size={120} className="text-secondary" />
         </div>
         
-        <AvatarRoot className="h-32 w-32 border-[6px] border-white shadow-2xl relative z-10">
+        <Avatar className="h-32 w-32 border-[6px] border-white shadow-2xl relative z-10">
             <AvatarImage src={profile?.avatar_url} />
             <AvatarFallback className="bg-primary text-white text-4xl font-black italic">
                 {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
             </AvatarFallback>
-        </AvatarRoot>
+        </Avatar>
         
         <div className="space-y-3 relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 rounded-full text-secondary font-black text-[9px] uppercase tracking-[0.2em] mb-1">
