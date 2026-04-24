@@ -6,67 +6,51 @@
 
 @layer base {
   :root {
-    --background: 60 40% 95%; /* Cream-ish base to match Troky */
-    --foreground: 60 30% 15%; /* Dark Khaki */
+    --background:60 40% 98%; /* Ultra clean cream/white */
+    --foreground: 60 40% 12%; /* Deep earthy dark */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 60 40% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 60 30% 15%;
-    --primary-foreground: 60 40% 95%;
-    --secondary: 93 42% 59%; /* Willow Green */
-    --secondary-foreground: 60 30% 15%;
-    --muted: 60 20% 90%;
-    --muted-foreground: 60 10% 40%;
-    --accent: 36 86% 49%; /* Carrot Orange */
-    --accent-foreground: 60 40% 95%;
+    --popover-foreground: 60 40% 12%;
+    --primary: 60 40% 12%;
+    --primary-foreground: 60 40% 98%;
+    --secondary: 161 71% 39%; /* Troky Emerald */
+    --secondary-foreground: 60 40% 98%;
+    --muted: 60 20% 92%;
+    --muted-foreground: 60 10% 45%;
+    --accent: 36 86% 49%; /* Troky Orange */
+    --accent-foreground: 60 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40.2% 98%;
-    --border: 60 20% 80%;
-    --input: 60 20% 80%;
-    --ring: 60 30% 15%;
-    --radius: 0.75rem;
+    --border: 60 20% 88%;
+    --input: 60 20% 88%;
+    --ring: 161 71% 39%;
+    --radius: 1.5rem;
 
-    /* Troky Legacy Colors */
-    --color-donez: 161 71% 39%;
-    --color-schimb: 221 83% 53%;
-    --color-vreau: 48 96% 53%;
-    --color-add: 36 86% 49%;
+    /* Semantic Listing Colors */
+    --status-donez: 161 71% 39%;
+    --status-schimb: 221 83% 53%;
+    --status-vreau: 36 86% 49%;
   }
 
   .dark {
     --background: 60 30% 5%;
     --foreground: 60 40% 95%;
-    --card: 60 30% 10%;
-    --card-foreground: 60 40% 95%;
-    --popover: 60 30% 10%;
-    --popover-foreground: 60 40% 95%;
-    --primary: 60 40% 95%;
-    --primary-foreground: 60 30% 5%;
-    --secondary: 93 42% 30%;
-    --secondary-foreground: 60 40% 95%;
-    --muted: 60 30% 15%;
-    --muted-foreground: 60 20% 70%;
-    --accent: 36 86% 49%;
-    --accent-foreground: 60 40% 95%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40.2% 98%;
-    --border: 60 30% 20%;
-    --input: 60 30% 20%;
-    --ring: 60 40% 95%;
+    /* ... keeping dark mode placeholders for future proofing ... */
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border selection:bg-secondary/20 selection:text-secondary;
   }
   body {
-    @apply text-foreground min-h-screen relative;
+    @apply text-foreground min-h-screen relative antialiased overflow-x-hidden;
     font-family: 'Outfit', sans-serif;
-    background: transparent;
+    background-color: hsl(var(--background));
   }
 
+  /* Decorative Background România */
   .bg-map {
     position: fixed;
     top: 50%;
@@ -77,65 +61,57 @@
     background-image: url('/romania_map_subtle_1776268652040.png');
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 90%;
-    opacity: 0.4;
+    background-size: 85%;
+    opacity: 0.15;
     z-index: -1;
     pointer-events: none;
+    filter: sepia(0.2) saturate(0.5);
   }
 
   .main-content {
     @apply relative z-10 flex-1;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tighter font-black text-primary;
+  }
 }
 
-/* RESPONSIVE TYPE & SPACING */
-@media (max-width: 768px) {
-  h1 { font-size: 2.5rem !important; line-height: 1.1 !important; letter-spacing: -1px !important; }
-  .navbar { @apply py-2; }
-  .grid-mobile-2 { grid-template-columns: repeat(2, 1fr) !important; }
+/* PREMIUM UTILITIES */
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)];
+  }
+
+  .premium-input {
+    @apply h-14 rounded-2xl bg-muted/30 border-transparent focus:bg-white focus:border-secondary focus:ring-4 focus:ring-secondary/10 transition-all duration-300 font-bold;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
 }
 
-@media (max-width: 480px) {
-  h1 { font-size: 1.8rem !important; }
-  .container { @apply px-4; }
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+  width: 10px;
 }
-
-html {
+::-webkit-scrollbar-track {
   @apply bg-background;
 }
-
-/* 
-   Legacy classes preserved for gradual transition 
-   (so the site doesn't break completely while we migrate)
-*/
-.container {
-  @apply max-w-[1200px] mx-auto px-4;
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full border-4 border-background hover:bg-muted-foreground transition-colors;
 }
 
-.glass {
-  @apply bg-white/40 backdrop-blur-xl border border-white/20 shadow-lg;
+/* ANIMATIONS */
+@keyframes soft-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
-
-.glass-panel {
-  @apply bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl border border-white/10 shadow-xl;
-}
-
-.animate-fade-in {
-  @apply animate-in fade-in slide-in-from-bottom-2 duration-500;
-}
-
-.hover-lift {
-  @apply transition-transform duration-200 hover:-translate-y-1.5;
-}
-
-.btn {
-  @apply inline-flex items-center justify-center px-5 py-2.5 font-semibold rounded-lg transition-all duration-200;
-}
-
-.btn-primary {
-  @apply bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0;
-}
-
-.navbar {
-  @apply sticky top-0 z-50 py-4 border-b-2 border-[#10b981] bg-white/60 backdrop-blur-md shadow-sm;
+.animate-soft-float {
+  animation: soft-float 4s ease-in-out infinite;
 }
