@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { Filter, Search, MapPin, X, ChevronDown, Sparkles } from 'lucide-react'
+import { Filter, Search, MapPin, X, ChevronDown, Sparkles, Loader2, Tag, ArrowUpRight } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,20 +39,132 @@ export default function SearchFiltersSidebar({
   const [lat, setLat] = useState<number | null>(initialLat || null)
   const [lng, setLng] = useState<number | null>(initialLng || null)
   const [showMap, setShowMap] = useState(false)
+  
+  // AUTOCOMPLETE STATE
+  const [query, setQuery] = useState(initialQuery || '')
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const suggestionsRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+
+  // DEBOUNCE EFFECT FOR AUTOCOMPLETE
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (query.length < 2) {
+        setSuggestions([])
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        // Search in listings titles
+        const { data: listings } = await supabase
+          .from('listings')
+          .select('id, title, type')
+          .ilike('title', `%${query}%`)
+          .limit(5)
+
+        // Search in categories
+        const { data: categories } = await supabase
+          .from('categories')
+          .select('id, name, slug')
+          .ilike('name', `%${query}%`)
+          .limit(3)
+
+        const combined = [
+          ...(categories?.map(c => ({ ...c, isCategory: true })) || []),
+          ...(listings?.map(l => ({ ...l, isListing: true })) || [])
+        ]
+        setSuggestions(combined)
+      } catch (error) {
+        console.error('Autocomplete error:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [query])
+
+  // CLOSE SUGGESTIONS ON CLICK OUTSIDE
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <div className="w-full glass-card rounded-[2.5rem] p-3 lg:p-4 border-white/50 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.06)] transition-all">
       <form action="/search" className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
           
           {/* 1. KEYWORD SEARCH */}
-          <div className="flex-[1.8] relative group">
+          <div className="flex-[1.8] relative group" ref={suggestionsRef}>
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-secondary transition-colors" size={20} />
               <Input 
                 name="q" 
-                defaultValue={initialQuery} 
+                value={query}
+                onChange={(e) => {
+                    setQuery(e.target.value)
+                    setShowSuggestions(true)
+                }}
+                onFocus={() => setShowSuggestions(true)}
                 placeholder="Ce cauți astăzi pentru troc?" 
-                className="premium-input pl-14 h-16 rounded-[1.5rem] bg-white border-transparent shadow-inner" 
+                className="premium-input pl-14 h-16 rounded-[1.5rem] bg-white border-transparent shadow-inner transition-all hover:bg-white/95" 
+                autoComplete="off"
               />
+              
+              {/* AUTOCOMPLETE DROPDOWN */}
+              {showSuggestions && (query.length >= 2 || isLoading) && (
+                <div className="absolute top-[110%] left-0 right-0 bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-[0_48px_80px_-12px_rgba(0,0,0,0.12)] border border-white/50 p-4 z-[100] animate-in fade-in slide-in-from-top-4 duration-500 overflow-hidden">
+                    {isLoading ? (
+                        <div className="flex items-center justify-center py-10 gap-3 text-muted-foreground">
+                            <Loader2 className="animate-spin" size={20} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Se caută idei...</span>
+                        </div>
+                    ) : suggestions.length > 0 ? (
+                        <div className="space-y-1">
+                            <div className="px-4 py-2">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sugestii pentru tine</span>
+                            </div>
+                            {suggestions.map((item, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                        setQuery(item.isCategory ? item.name : item.title)
+                                        setShowSuggestions(false)
+                                    }}
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-white transition-all text-left group/item"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm",
+                                            item.isCategory ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"
+                                        )}>
+                                            {item.isCategory ? <Tag size={16} /> : <Search size={16} />}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black tracking-tight">{item.isCategory ? item.name : item.title}</p>
+                                            <p className="text-[9px] font-bold text-muted-foreground uppercase">{item.isCategory ? 'Categorie' : `Produs • ${item.type}`}</p>
+                                        </div>
+                                    </div>
+                                    <ArrowUpRight className="text-muted-foreground opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" size={16} />
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="px-6 py-10 text-center space-y-2">
+                            <p className="text-sm font-black">Niciun rezultat găsit</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase">Încearcă alte cuvinte cheie</p>
+                        </div>
+                    )}
+                </div>
+              )}
           </div>
 
           {/* 2. CATEGORY SELECT */}

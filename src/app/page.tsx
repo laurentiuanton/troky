@@ -181,11 +181,12 @@ export default async function HomePage(props: { searchParams: Promise<{ q?: stri
                   return (
                     <Link href={`/listing/${listing.id}`} key={listing.id} className="group animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${i * 50}ms` }}>
                       <Card className="border-none bg-white overflow-hidden rounded-[3rem] transition-all duration-500 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] group-hover:shadow-[0_48px_80px_-12px_rgba(0,0,0,0.12)] group-hover:-translate-y-2 h-full flex flex-col">
-                          <div className="relative aspect-square overflow-hidden bg-muted/20">
+                          {/* IMAGE CONTAINER */}
+                          <div className="relative h-72 rounded-[2rem] overflow-hidden mb-6 isolate">
                               <img 
                                   src={primaryImage} 
                                   alt={listing.title} 
-                                  className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" 
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out rounded-[2rem] transform-gpu" 
                               />
                               <div className="absolute top-6 left-6">
                                   <div className={cn(
