@@ -16,7 +16,7 @@ export function RealtimeNotifications({ userId }: { userId: string | undefined }
     const supabase = createClient()
     
     const showNotification = (content: string, senderName: string, listingId?: string, otherUserId?: string) => {
-      toast.custom((t) => (
+      toast.custom((t: any) => (
         <div className={cn(
           "w-full max-w-md bg-white/90 backdrop-blur-2xl border border-white/50 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2rem] p-5 flex items-start gap-4 animate-in slide-in-from-right-10 duration-500 ring-1 ring-black/5",
           t.visible ? "opacity-100" : "opacity-0"
