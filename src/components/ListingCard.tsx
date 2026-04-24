@@ -23,7 +23,14 @@ export default function ListingCard({ listing }: { listing: any }) {
         className="glass-panel hover-lift h-full flex flex-col border border-border/60 bg-white shadow-sm hover:shadow-2xl transition-all duration-300 rounded-[1.5rem] overflow-hidden" 
         style={{ textDecoration: 'none', color: 'inherit' }}
       >
-        <div style={{ height: '140px', width: '100%', background: `url(${primaryImage}) center/cover no-repeat`, borderBottom: '1px solid var(--border)', position: 'relative' }}>
+        <div className="aspect-square w-full relative border-b border-border bg-muted/20">
+          <div 
+            className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-700 group-hover:scale-110"
+            style={{ backgroundImage: `url(${primaryImage})` }}
+          />
+          
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+
           <span className="absolute top-3 left-3 z-10 text-[9px] font-black tracking-widest uppercase px-3 py-1 rounded-full bg-white/90 backdrop-blur-md shadow-sm border border-black/5">
             {listing.tip_anunt === 'donatie' ? '🎁 Gratuit' : listing.tip_anunt === 'vreau' ? '🔍 Cerere' : '🔄 Schimb'}
           </span>
