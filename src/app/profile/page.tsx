@@ -29,8 +29,12 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
 
   // Fetch Unread Count Safely
   let unreadCount = 0
-  const { count } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('read_state', false)
-  unreadCount = count || 0
+  try {
+    const { count, error } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('read_state', false)
+    if (!error) unreadCount = count || 0
+  } catch (e) {
+    console.error('Error fetching unread count:', e)
+  }
 
   return (
     <div className="container max-w-7xl py-12 px-4 animate-fade-in relative z-10">
@@ -63,7 +67,7 @@ export default async function ProfilePage(props: { searchParams: Promise<{ tab?:
                         icon={<MessageSquare size={18} />} 
                         label="Mesaje" 
                         isActive={activeTab === 'mesaje'} 
-                        customBadge={<MessagesBadge userId={user.id} initialCount={unreadCount} />}
+                        customBadge={unreadCount > 0 ? <Badge className="bg-destructive ml-auto">{unreadCount}</Badge> : null}
                     />
                     <SidebarLink href="/profile?tab=setari" icon={<Settings size={18} />} label="Setările Contului" isActive={activeTab === 'setari'} />
                 </nav>
