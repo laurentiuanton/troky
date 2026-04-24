@@ -27,7 +27,7 @@ export async function getAutocompleteSuggestions(query: string): Promise<string[
 
     // Returnăm titluri unice și le curățăm
     const titles = data.map((item: { title: string }) => item.title.trim())
-    return Array.from(new Set(titles)).slice(0, 6)
+    return Array.from(new Set(titles)).slice(0, 6) as string[]
   } catch (err) {
     console.error('Autocomplete error:', err)
     return []
