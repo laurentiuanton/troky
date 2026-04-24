@@ -11,13 +11,14 @@ import SearchFiltersSidebar from '@/components/SearchFiltersSidebar'
 
 export const revalidate = 0;
 
-export default async function SearchPage(props: { searchParams: Promise<{ q?: string, category?: string, lat?: string, lng?: string, radius?: string }> }) {
+export default async function SearchPage(props: { searchParams: Promise<{ q?: string, category?: string, lat?: string, lng?: string, radius?: string, type?: string }> }) {
   const searchParams = await props.searchParams
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
   const queryText = searchParams.q || '';
   const categorySlug = searchParams.category || '';
+  const listingType = searchParams.type || 'all';
 
   let categoryId = null;
   let categoryName = null;
@@ -37,13 +38,20 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
 
   if (userLat && userLng) {
      // Radius search
-     const { data } = await supabase.rpc('search_listings_by_radius', {
+     let rpcQuery = supabase.rpc('search_listings_by_radius', {
         user_lat: userLat,
         user_lng: userLng,
         radius_km: radius,
         search_query: queryText,
         search_category: categorySlug === 'all' ? '' : categorySlug
-     }).select('*, categories(name), listing_images(image_url, is_primary)')
+     })
+     
+     if (listingType && listingType !== 'all') {
+        rpcQuery = rpcQuery.eq('tip_anunt', listingType)
+     }
+
+     const { data } = await rpcQuery
+       .select('*, categories(name), listing_images(image_url, is_primary)')
        .order('created_at', { ascending: false });
        
      listings = data || [];
@@ -60,6 +68,10 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
    
      if (queryText) {
        dbQuery = dbQuery.ilike('title', `%${queryText}%`);
+     }
+     
+     if (listingType && listingType !== 'all') {
+       dbQuery = dbQuery.eq('tip_anunt', listingType);
      }
    
      dbQuery = dbQuery.order('created_at', { ascending: false });
@@ -88,6 +100,7 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
             <SearchFiltersSidebar 
                 initialQuery={queryText}
                 initialCategory={categorySlug || 'all'}
+                initialType={listingType}
                 allCategories={allCategories || []}
                 initialLat={userLat || undefined}
                 initialLng={userLng || undefined}

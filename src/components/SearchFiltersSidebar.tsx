@@ -20,6 +20,7 @@ const MapLocationPicker = dynamic(() => import('@/components/MapLocationPicker')
 export default function SearchFiltersSidebar({ 
   initialQuery, 
   initialCategory,
+  initialType,
   allCategories,
   initialLat,
   initialLng,
@@ -27,6 +28,7 @@ export default function SearchFiltersSidebar({
 }: { 
   initialQuery: string
   initialCategory: string
+  initialType: string
   allCategories: any[]
   initialLat?: number
   initialLng?: number
@@ -57,10 +59,25 @@ export default function SearchFiltersSidebar({
                           <SelectValue placeholder="Oriunde pe platformă" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
-                          <SelectItem value="all">Oriunde pe platformă</SelectItem>
+                          <SelectItem value="all">Orice Categorie</SelectItem>
                           {allCategories?.map((c: any) => (
                               <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>
                           ))}
+                      </SelectContent>
+                  </Select>
+              </div>
+
+              <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tip Anunț</label>
+                  <Select name="type" defaultValue={initialType}>
+                      <SelectTrigger className="h-11 rounded-xl bg-muted/10 border-border font-bold text-primary">
+                          <SelectValue placeholder="Orice tip" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                          <SelectItem value="all">Toate tipurile</SelectItem>
+                          <SelectItem value="donatie">Doar Donații (Gratuit)</SelectItem>
+                          <SelectItem value="schimb">Doar Schimburi (Barter)</SelectItem>
+                          <SelectItem value="vreau">Doar Cereri (Vreau)</SelectItem>
                       </SelectContent>
                   </Select>
               </div>
@@ -111,7 +128,7 @@ export default function SearchFiltersSidebar({
                   <Button type="submit" className="w-full bg-[#37371f] hover:bg-[#202012] text-white font-black h-12 rounded-xl text-md">
                       Aplică filtrele
                   </Button>
-                  {(initialQuery || initialCategory !== 'all' || lat) && (
+                  {(initialQuery || initialCategory !== 'all' || initialType !== 'all' || lat) && (
                       <Button asChild variant="ghost" className="w-full font-bold h-11 rounded-xl text-muted-foreground hover:bg-muted/50">
                           <Link href="/search">Resetează Căutarea</Link>
                       </Button>
