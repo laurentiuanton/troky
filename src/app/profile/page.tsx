@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ClientPasswordUpdate } from './ClientPasswordUpdate'
 import ChatContainer from './ChatContainer'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
