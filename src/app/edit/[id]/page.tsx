@@ -262,7 +262,8 @@ export default function EditListingPage(props: { params: Promise<{ id: string }>
                         <input type="hidden" name="location" value={locationText} />
                         <Card className="rounded-[2.5rem] border-4 border-muted/50 overflow-hidden shadow-inner group relative">
                             <MapLocationPicker 
-                                initialPos={listing.lat && listing.lng ? {lat: listing.lat, lng: listing.lng} : undefined}
+                                initialLat={listing.lat}
+                                initialLng={listing.lng}
                                 onChange={(newLat, newLng, newAddress) => {
                                     setLat(newLat)
                                     setLng(newLng)
