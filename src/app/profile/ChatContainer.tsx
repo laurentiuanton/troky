@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare, ChevronLeft } from 'lucide-react'
+import { Send, User as UserIcon, Package, Check, CheckCheck, Clock, Search, MessageSquare, ChevronLeft, Image as ImageIcon, Paperclip, Loader2 } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +17,8 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
   const [messages, setMessages] = useState<any[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -118,6 +120,44 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
     
     setMessages(data || [])
     setLoading(false)
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !selectedChat) return
+
+    setUploadingImage(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`
+      
+      const { error: uploadError } = await supabase.storage
+        .from('chat-images')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat-images')
+        .getPublicUrl(fileName)
+
+      const { error: msgError } = await supabase.from('messages').insert({
+        sender_id: currentUser.id,
+        receiver_id: selectedChat.other_user_id,
+        listing_id: selectedChat.listing_id,
+        content: '📷 Imagine trimisă',
+        image_url: publicUrl
+      })
+
+      if (msgError) throw msgError
+
+    } catch (err: any) {
+      console.error('Error uploading image:', err)
+      alert('Eroare la încărcarea imaginii: ' + err.message)
+    } finally {
+      setUploadingImage(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -270,13 +310,25 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
                   >
                     <div 
                         className={cn(
-                            "px-5 py-3 text-sm font-medium shadow-xl shadow-black/5 transition-all text-sm",
+                            "px-5 py-3 text-sm font-medium shadow-xl shadow-black/5 transition-all",
                             isMe 
                                 ? "bg-[#37371f] text-white rounded-[20px] rounded-br-[4px]" 
                                 : "bg-white text-foreground rounded-[20px] rounded-bl-[4px] border border-border/60"
                         )}
                     >
-                        {m.content}
+                        {m.image_url ? (
+                            <div className="space-y-2">
+                                <img 
+                                    src={m.image_url} 
+                                    alt="Imagine chat" 
+                                    className="max-w-full rounded-lg border border-white/20 shadow-sm cursor-zoom-in" 
+                                    onClick={() => window.open(m.image_url, '_blank')}
+                                />
+                                {m.content !== '📷 Imagine trimisă' && <p>{m.content}</p>}
+                            </div>
+                        ) : (
+                            m.content
+                        )}
                         <div className={cn(
                             "flex items-center justify-end gap-1.5 text-[9px] font-bold mt-1.5 uppercase tracking-tighter opacity-60",
                             isMe ? "text-white/80" : "text-muted-foreground"
@@ -295,14 +347,31 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
 
             {/* INPUT AREA */}
             <div className="p-6 border-top border-border bg-white">
-                <form onSubmit={handleSendMessage} className="flex gap-3 items-center bg-muted/30 p-1.5 rounded-full border border-border shadow-inner">
+                <form onSubmit={handleSendMessage} className="flex gap-3 items-center bg-muted/30 p-1.5 rounded-3xl border border-border shadow-inner">
+                    <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        className="hidden" 
+                        accept="image/*" 
+                        onChange={handleImageUpload} 
+                    />
+                    <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        disabled={uploadingImage}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="h-10 w-10 rounded-full hover:bg-white text-muted-foreground hover:text-primary"
+                    >
+                        {uploadingImage ? <Loader2 size={18} className="animate-spin" /> : <Paperclip size={18} />}
+                    </Button>
                     <Input 
                         value={newMessage} 
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Trimite un mesaj prietenos..." 
-                        className="flex-1 bg-transparent border-none focus-visible:ring-0 text-sm font-medium px-4 h-11"
+                        placeholder="Trimite un mesaj..." 
+                        className="flex-1 bg-transparent border-none focus-visible:ring-0 text-sm font-medium px-2 h-11"
                     />
-                    <Button type="submit" size="icon" className="h-11 w-11 rounded-full bg-[#37371f] hover:bg-[#10b981] transition-all shadow-lg active:scale-90">
+                    <Button type="submit" size="icon" className="h-11 w-11 rounded-full bg-[#37371f] hover:bg-[#10b981] transition-all shadow-lg">
                         <Send size={18} className="translate-x-0.5 -translate-y-0.5" />
                     </Button>
                 </form>

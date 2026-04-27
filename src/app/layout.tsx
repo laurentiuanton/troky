@@ -71,6 +71,7 @@ function Footer() {
 }
 
 import { Toaster } from 'sonner'
+import { RealtimeNotifications } from '@/components/RealtimeNotifications'
 
 export default async function RootLayout({
   children,
@@ -86,6 +87,7 @@ export default async function RootLayout({
       <body suppressHydrationWarning className="flex flex-col min-h-screen">
         <div className="bg-map" />
         <Toaster position="top-center" richColors />
+        <RealtimeNotifications userId={user?.id} />
         <Header />
         <main className="main-content">
           {children}
