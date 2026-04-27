@@ -77,3 +77,24 @@ export async function resetPassword(formData: FormData) {
     console.error('Reset error:', error)
   }
 }
+
+export async function signInWithGoogle() {
+  const cookieStore = await cookies()
+  const supabase = createClient(cookieStore)
+  
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://troky.vercel.app'}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    console.error('Google login error:', error)
+    return { error: error.message }
+  }
+
+  if (data.url) {
+    redirect(data.url)
+  }
+}
