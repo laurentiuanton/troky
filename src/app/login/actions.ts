@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 export async function login(formData: FormData) {
   const cookieStore = await cookies()
@@ -81,11 +81,16 @@ export async function resetPassword(formData: FormData) {
 export async function signInWithGoogle() {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
+  const headerList = await headers()
+  const origin = headerList.get('origin') || headerList.get('host') || 'https://troky.vercel.app'
   
+  // Make sure origin starts with http/https
+  const absoluteOrigin = origin.startsWith('http') ? origin : `https://${origin}`
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://troky.vercel.app'}/auth/callback`,
+      redirectTo: `${absoluteOrigin}/auth/callback`,
     },
   })
 
