@@ -151,6 +151,19 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
 
       if (msgError) throw msgError
 
+      // NOTIFICARE REALTIME PENTRU IMAGINE
+      supabase.channel('global-notifications').send({
+        type: 'broadcast',
+        event: 'new-message',
+        payload: {
+          sender_id: currentUser.id,
+          sender_name: currentUser.user_metadata?.full_name || 'Utilizator Troky',
+          receiver_id: selectedChat.other_user_id,
+          content: '📷 Ți-a trimis o imagine',
+          listing_id: selectedChat.listing_id
+        }
+      })
+
     } catch (err: any) {
       console.error('Error uploading image:', err)
       alert('Eroare la încărcarea imaginii: ' + err.message)
@@ -192,8 +205,21 @@ export default function ChatContainer({ currentUser, initialConversations }: { c
         setMessages(prev => prev.filter(m => m.id !== tempId))
     } else {
         setMessages(prev => prev.map(m => m.id === tempId ? { ...data, status: 'sent' } : m))
+        
+        // TRIMITEM NOTIFICARE REALTIME PRIN BROADCAST
+        supabase.channel('global-notifications').send({
+          type: 'broadcast',
+          event: 'new-message',
+          payload: {
+            sender_id: currentUser.id,
+            sender_name: currentUser.user_metadata?.full_name || 'Utilizator Troky',
+            receiver_id: selectedChat.other_user_id,
+            content: msgContent,
+            listing_id: selectedChat.listing_id
+          }
+        })
     }
-  }
+}
 
   return (
     <Card className="grid grid-cols-1 md:grid-cols-12 h-[600px] md:h-[750px] border-border shadow-2xl shadow-black/5 rounded-3xl overflow-hidden bg-background">
