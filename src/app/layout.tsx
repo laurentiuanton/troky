@@ -70,6 +70,8 @@ function Footer() {
     )
 }
 
+import { Toaster } from 'sonner'
+
 export default async function RootLayout({
   children,
 }: {
@@ -83,6 +85,7 @@ export default async function RootLayout({
     <html lang="ro">
       <body suppressHydrationWarning className="flex flex-col min-h-screen">
         <div className="bg-map" />
+        <Toaster position="top-center" richColors />
         <Header />
         <main className="main-content">
           {children}
